@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-// Aplikacja do monitorowania przyjmowania leków i wyœwietlania skutecznoœci 
+    // Aplikacja do monitorowania przyjmowania leków i wyœwietlania skutecznoœci 
     // dzia³ania terapii w kontekœcie wype³nianych 5 razy dziennie ankiet pacjenta o 
     // symptomach rejestrowanych w postaci pytañ
 
