@@ -12,6 +12,8 @@ namespace TherapyQualityController.Models
         public string LastName { get; set; }
         public int PESEL { get; set; }
         public DateTime? DateOfBirth { get; set; }
+        public int QuestionnaireId { get; set; }
+        public Questionnaire Questionnaire { get; set; }
 
     }
 }

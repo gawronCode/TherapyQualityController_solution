@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace TherapyQualityController.Models
 {
-    public class Questionnaire
+    public class Question
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public DateTime? CreationDate { get; set; }
-        
+        public string Contents { get; set; }
+        public int QuestionnaireId { get; set; }
+        public Questionnaire Questionnaire { get; set; }
+
     }
 }
