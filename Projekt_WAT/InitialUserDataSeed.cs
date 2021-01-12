@@ -17,54 +17,38 @@ namespace TherapyQualityController
 
         }
 
-        public static void SeedUsers(UserManager<IdentityUser> userManager)
+        private static void SeedUsers(UserManager<IdentityUser> userManager)
         {
-            if (userManager.FindByNameAsync("admin").Result == null)
+            if (userManager.FindByNameAsync("admin").Result != null) return;
+            var user = new IdentityUser
             {
-                var user = new IdentityUser
-                {
-                    UserName = "admin",
-                    Email = "admin@gmail.com"
-                };
-                var result = userManager.CreateAsync(user, "P@ssword123").Result;
-                if (result.Succeeded)
-                {
-                    userManager.AddToRoleAsync(user, "Administrator").Wait();
-                }
+                UserName = "admin@gmail.com",
+                Email = "admin@gmail.com"
+            };
+            var result = userManager.CreateAsync(user, "password").Result;
+            if (result.Succeeded)
+            {
+                userManager.AddToRoleAsync(user, "Administrator").Wait();
             }
         }
 
-        public static void SeedRoles(RoleManager<IdentityRole> roleManager)
+        private static void SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            if (!roleManager.RoleExistsAsync("Administrator").Result)
-            {
-                var role = new IdentityRole
-                {
-                    Name="Administrator"
-                };
-                var result = roleManager.CreateAsync(role).Result;
-            }
-
-            if (!roleManager.RoleExistsAsync("Patient").Result)
-            {
-                var role = new IdentityRole
-                {
-                    Name="Patient"
-                };
-                var result = roleManager.CreateAsync(role).Result;
-            }
-
-            if (!roleManager.RoleExistsAsync("Doctor").Result)
-            {
-                var role = new IdentityRole
-                {
-                    Name="Doctor"
-                };
-                var result = roleManager.CreateAsync(role).Result;
-            }
-
+            CreateRole(roleManager, "Administrator");
+            CreateRole(roleManager, "Patient");
+            CreateRole(roleManager, "Doctor");
         }
 
+        private static void CreateRole(RoleManager<IdentityRole> roleManager,
+            string roleName)
+        {
+            if(roleManager.RoleExistsAsync(roleName).Result) return;
+            var role = new IdentityRole
+            {
+                Name = roleName
+            };
+            var result = roleManager.CreateAsync(role).Result;
+        }
 
     }
 }

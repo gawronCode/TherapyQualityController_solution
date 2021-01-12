@@ -10,7 +10,7 @@ using TherapyQualityController.Data;
 namespace TherapyQualityController.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210111213620_InitialMigration")]
+    [Migration("20210112160046_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -235,6 +235,7 @@ namespace TherapyQualityController.Migrations
                         .UseIdentityColumn();
 
                     b.Property<DateTime?>("AnswerDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<int>("QuestionId")
@@ -258,6 +259,7 @@ namespace TherapyQualityController.Migrations
                         .UseIdentityColumn();
 
                     b.Property<string>("Contents")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuestionnaireId")
@@ -278,9 +280,11 @@ namespace TherapyQualityController.Migrations
                         .UseIdentityColumn();
 
                     b.Property<DateTime?>("CreationDate")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -288,20 +292,26 @@ namespace TherapyQualityController.Migrations
                     b.ToTable("Questionnaires");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Patient", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<DateTime?>("DateOfBirth")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PESEL")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PWZ")
                         .HasColumnType("int");
 
                     b.Property<int>("QuestionnaireId")
@@ -309,7 +319,7 @@ namespace TherapyQualityController.Migrations
 
                     b.HasIndex("QuestionnaireId");
 
-                    b.HasDiscriminator().HasValue("Patient");
+                    b.HasDiscriminator().HasValue("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -385,7 +395,7 @@ namespace TherapyQualityController.Migrations
                     b.Navigation("Questionnaire");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Patient", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.User", b =>
                 {
                     b.HasOne("TherapyQualityController.Models.Questionnaire", "Questionnaire")
                         .WithMany()
