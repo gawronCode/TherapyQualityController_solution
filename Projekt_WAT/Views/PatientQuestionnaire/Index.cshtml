@@ -1,0 +1,25 @@
+﻿@using System.Linq
+@model TherapyQualityController.Models.QuestionnaireViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>@Model.Name</h1>
+
+<div class="container">
+    <div class="row">
+        <h3>Liczba pytań: @Model.Fields.Count.ToString()</h3>
+    </div>
+    <hr>
+    @foreach (var item in Model.Fields)
+    {
+        <div class="media">
+            <div class="media-body">
+                <h5 class="mt-0">@item.Question.Contents</h5>
+            </div>
+        </div>
+        <hr>
+    }
+
+</div>
