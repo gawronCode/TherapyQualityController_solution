@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TherapyQualityController.Data;
+using TherapyQualityController.Repositories;
 
 namespace TherapyQualityController
 {
@@ -32,6 +33,9 @@ namespace TherapyQualityController
             services.AddDefaultIdentity<IdentityUser>().AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
+
+            services.AddScoped<IQuestionnaireRepo, QuestionnaireRepo>();
+            services.AddScoped<IQuestionRepo, QuestionRepo>();
 
             services.Configure<IdentityOptions>(options =>
             {

@@ -8,5 +8,6 @@ namespace TherapyQualityController.Repositories
 {
     public interface IQuestionRepo : IGeneralRepo<Question>
     {
+        Task<ICollection<Question>> GetQuestionsByQuestionnaireId(int id);
     }
 }
