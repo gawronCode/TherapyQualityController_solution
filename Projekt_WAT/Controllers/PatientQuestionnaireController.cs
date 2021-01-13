@@ -41,7 +41,7 @@ namespace TherapyQualityController.Controllers
                 Name = questionnaire.Name,
                 Fields = new List<FieldViewModel>()
             };
-
+            int i = 0;
             foreach (var question in questions)
             {
                 var questionVm = new QuestionViewModel
@@ -50,22 +50,18 @@ namespace TherapyQualityController.Controllers
                 };
                 model.Fields.Add(new FieldViewModel
                 {
+                    Count = i,
                     Answer = new AnswerViewModel(),
                     Question = questionVm
                 });
+                i++;
             }
 
             return View(model);
         }
 
-        // GET: PatientQuestionnaireController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
         // GET: PatientQuestionnaireController/Create
-        public ActionResult Create()
+        public ActionResult SendAnswers()
         {
             return View();
         }
@@ -73,7 +69,7 @@ namespace TherapyQualityController.Controllers
         // POST: PatientQuestionnaireController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult SendAnswers(IFormCollection collection)
         {
             try
             {
@@ -85,46 +81,6 @@ namespace TherapyQualityController.Controllers
             }
         }
 
-        // GET: PatientQuestionnaireController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: PatientQuestionnaireController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: PatientQuestionnaireController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: PatientQuestionnaireController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
     }
 }

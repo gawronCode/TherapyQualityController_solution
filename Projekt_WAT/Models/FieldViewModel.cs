@@ -7,6 +7,7 @@ namespace TherapyQualityController.Models
 {
     public class FieldViewModel
     {
+        public int Count { get; set; }
         public QuestionViewModel Question { get; set; }
         public AnswerViewModel Answer { get; set; }
     }
