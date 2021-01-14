@@ -18,15 +18,15 @@ namespace TherapyQualityController.Controllers
 
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IPatientRepo _patientRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            UserManager<IdentityUser> userManager)
+            IPatientRepo patientRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
-            _userManager = userManager;
+            _patientRepo = patientRepo;
 
         }
 
@@ -34,13 +34,10 @@ namespace TherapyQualityController.Controllers
         public ActionResult Index()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _userManager.FindByEmailAsync(userEmail).Result;
-            //var userQuestionnaireId = (user as User).QuestionnaireId;
-
-            //TODO - trzeba zrobić repo dla czytania danych o userze
-
-            var questionnaire = _questionnaireRepo.GetById(1).Result;
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(1).Result;
+            var userQuestionnaireId = _patientRepo.GetPatientQuestionnaireIdByEmail(userEmail).Result;
+            
+            var questionnaire = _questionnaireRepo.GetById(userQuestionnaireId).Result;
+            var questions = _questionRepo.GetQuestionsByQuestionnaireId(userQuestionnaireId).Result;
 
             var model = new QuestionnaireViewModel
             {
