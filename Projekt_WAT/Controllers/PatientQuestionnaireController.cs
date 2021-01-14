@@ -44,14 +44,10 @@ namespace TherapyQualityController.Controllers
             int i = 0;
             foreach (var question in questions)
             {
-                var questionVm = new QuestionViewModel
-                {
-                    Contents = question.Contents
-                };
+                var questionVm = question.Contents;
                 model.Fields.Add(new FieldViewModel
                 {
                     Count = i,
-                    Answer = new AnswerViewModel(),
                     Question = questionVm
                 });
                 i++;
@@ -63,24 +59,36 @@ namespace TherapyQualityController.Controllers
         // GET: PatientQuestionnaireController/Create
         public ActionResult SendAnswers()
         {
-            return View();
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: PatientQuestionnaireController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SendAnswers(IFormCollection collection)
+        public ActionResult SendAnswers(IFormCollection form)
         {
+
+            int count = Convert.ToInt32(form["count"]);
+            List<int> answers = new List<int>();
+
+            for (int i = 0; i < count; i++)
+            {
+                answers.Add(Convert.ToInt32(form[$"opt{i.ToString()}"]));
+            }
+
             try
             {
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View();
+                return RedirectToAction(nameof(Index));
             }
         }
 
-        
-    }
+        // new FieldViewModel{
+        //     Count = item.Count,
+        //     Question = item.Question,
+        //     Answer = 1}
+}
 }

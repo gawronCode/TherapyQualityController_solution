@@ -1,9 +1,28 @@
 ﻿@using System.Linq
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using TherapyQualityController.Models
 @model TherapyQualityController.Models.QuestionnaireViewModel
 
 @{
     ViewData["Title"] = "Index";
 }
+
+@functions {
+
+    FieldViewModel RetVal(int count, string question, int answer)
+    {
+        return new FieldViewModel
+        {
+            Count = count,
+            Question = question,
+            Answer = answer
+        };
+    }
+
+}
+
+@{ FieldViewModel x = RetVal(5, "lala", 2);}
+
 
 <h1>@Model.Name</h1>
 
@@ -16,29 +35,30 @@
         <form asp-action="SendAnswers" method="post">
             @foreach (var item in Model.Fields)
             {
+
                 <div class="media">
 
                     <div class="media-body">
 
                         <div>
-                            <h5 class="mt-0">@item.Question.Contents</h5>
+                            <h5 class="mt-0">@item.Question</h5>
                         </div>
 
                         <div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count}") id="inlineRadio1" value="1">
+                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio1" value=1>
                                 <label class="form-check-label" for="inlineRadio1">1</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count}") id="inlineRadio2" value="2">
+                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio2" value=2>
                                 <label class="form-check-label" for="inlineRadio2">2</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count}") id="inlineRadio3" value="3">
+                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio3" value=3>
                                 <label class="form-check-label" for="inlineRadio3">3</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count}") id="inlineRadio4" value="4">
+                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio4" value=4>
                                 <label class="form-check-label" for="inlineRadio4">4</label>
                             </div>
                         </div>
@@ -50,7 +70,7 @@
                 </div>
                 <hr>
             }
-            <a class="btn btn-dark btn-lg" role="button" style="margin-top: 10px; color: white">Prześlij ankietę</a>
+            <button class="btn btn-dark btn-lg" type="submit" name="count" value=@Model.Fields.Count style="margin-top: 10px; color: white">Prześlij</button>
         </form>
     </div>
 
