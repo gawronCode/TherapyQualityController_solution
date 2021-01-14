@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using TherapyQualityController.Models;
 
 namespace TherapyQualityController
 {
     public static class InitialUserDataSeed
     {
         public static void Seed(
-            UserManager<IdentityUser> userManager,
+            UserManager<User> userManager,
             RoleManager<IdentityRole> roleManager)
         {
             SeedRoles(roleManager);
@@ -17,10 +18,10 @@ namespace TherapyQualityController
 
         }
 
-        private static void SeedUsers(UserManager<IdentityUser> userManager)
+        private static void SeedUsers(UserManager<User> userManager)
         {
             if (userManager.FindByNameAsync("admin").Result != null) return;
-            var user = new IdentityUser
+            var user = new User
             {
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com"
