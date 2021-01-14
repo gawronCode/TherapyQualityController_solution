@@ -14,11 +14,11 @@ namespace TherapyQualityController.Models
         [Required]
         public string LastName { get; set; }
         [Required]
-        public int PESEL { get; set; }
-        public int PWZ { get; set; }
+        public string PESEL { get; set; }
+        public string PWZ { get; set; }
         [Required]
         public DateTime? DateOfBirth { get; set; }
-        public int QuestionnaireId { get; set; }
+        public int? QuestionnaireId { get; set; }
         public Questionnaire Questionnaire { get; set; }
 
     }

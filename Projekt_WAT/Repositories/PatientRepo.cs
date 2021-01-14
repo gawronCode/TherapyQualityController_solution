@@ -19,7 +19,8 @@ namespace TherapyQualityController.Repositories
         public async Task<int> GetPatientQuestionnaireIdByEmail(string email)
         {
             var patient = await _context.Patients.FirstOrDefaultAsync(q => q.Email == email);
-            return patient.QuestionnaireId;
+            int questionnaireId = patient.QuestionnaireId ?? default(int);
+            return questionnaireId;
         }
     }
 }

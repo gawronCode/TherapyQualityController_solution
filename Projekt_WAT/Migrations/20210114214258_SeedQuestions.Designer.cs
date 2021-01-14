@@ -10,8 +10,8 @@ using TherapyQualityController.Data;
 namespace TherapyQualityController.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210114173502_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20210114214258_SeedQuestions")]
+    partial class SeedQuestions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -308,13 +308,14 @@ namespace TherapyQualityController.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PESEL")
-                        .HasColumnType("int");
+                    b.Property<string>("PESEL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PWZ")
-                        .HasColumnType("int");
+                    b.Property<string>("PWZ")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("QuestionnaireId")
+                    b.Property<int?>("QuestionnaireId")
                         .HasColumnType("int");
 
                     b.HasIndex("QuestionnaireId");
@@ -399,9 +400,7 @@ namespace TherapyQualityController.Migrations
                 {
                     b.HasOne("TherapyQualityController.Models.Questionnaire", "Questionnaire")
                         .WithMany()
-                        .HasForeignKey("QuestionnaireId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("QuestionnaireId");
 
                     b.Navigation("Questionnaire");
                 });

@@ -33,9 +33,10 @@ namespace TherapyQualityController.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<ICollection<Questionnaire>> GetAll()
+        public async Task<ICollection<Questionnaire>> GetAll()
         {
-            throw new NotImplementedException();
+            var questionnaires = await _context.Questionnaires.ToListAsync();
+            return questionnaires;
         }
 
         public async Task<Questionnaire> GetById(int id)

@@ -36,24 +36,29 @@ namespace TherapyQualityController.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var userQuestionnaireId = _patientRepo.GetPatientQuestionnaireIdByEmail(userEmail).Result;
             
-            var questionnaire = _questionnaireRepo.GetById(userQuestionnaireId).Result;
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(userQuestionnaireId).Result;
+            QuestionnaireViewModel model = null;
 
-            var model = new QuestionnaireViewModel
+            if (userQuestionnaireId > 0)
             {
-                Name = questionnaire.Name,
-                Fields = new List<FieldViewModel>()
-            };
-            var i = 0;
-            foreach (var question in questions)
-            {
-                model.Fields.Add(new FieldViewModel
+                var questionnaire = _questionnaireRepo.GetById(userQuestionnaireId).Result;
+                var questions = _questionRepo.GetQuestionsByQuestionnaireId(userQuestionnaireId).Result;
+
+                model = new QuestionnaireViewModel
                 {
-                    Count = i,
-                    Question = question.Contents,
-                    QuestionId = question.Id
-                });
-                i++;
+                    Name = questionnaire.Name,
+                    Fields = new List<FieldViewModel>()
+                };
+                var i = 0;
+                foreach (var question in questions)
+                {
+                    model.Fields.Add(new FieldViewModel
+                    {
+                        Count = i,
+                        Question = question.Contents,
+                        QuestionId = question.Id
+                    });
+                    i++;
+                }
             }
 
             return View(model);

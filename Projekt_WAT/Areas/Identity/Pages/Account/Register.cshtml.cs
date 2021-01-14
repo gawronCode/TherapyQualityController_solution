@@ -97,10 +97,9 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     LastName = Input.LastName,
-                    PESEL = Convert.ToInt32(Input.PESEL),
-                    PWZ = Input.PWZ is null ? 0 : Convert.ToInt32(Input.PWZ),
+                    PESEL = Input.PESEL,
+                    PWZ = Input.PWZ,
                     DateOfBirth = DateTime.Now,
-                    QuestionnaireId = 1
                 };
                 
                     var result = await _userManager.CreateAsync(user, Input.Password);
