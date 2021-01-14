@@ -5,50 +5,56 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using TherapyQualityController.Models;
 using TherapyQualityController.Repositories;
 
 namespace TherapyQualityController.Controllers
 {
+    [Authorize]
     public class PatientQuestionnaireController : Controller
     {
 
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
-            IQuestionRepo questionRepo)
+            IQuestionRepo questionRepo,
+            UserManager<IdentityUser> userManager)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
+            _userManager = userManager;
 
         }
 
         // GET: PatientQuestionnaireController
         public ActionResult Index()
         {
-            // var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            // var user = _userManager.FindByEmailAsync(userEmail).Result;
-            // var userQuestionnaireId = user.QuestionnaireId;
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = _userManager.FindByEmailAsync(userEmail).Result;
+            //var userQuestionnaireId = (user as User).QuestionnaireId;
 
-            var questionnaire = _questionnaireRepo.GetById(2).Result;
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(2).Result;
+            //TODO - trzeba zrobić repo dla czytania danych o userze
+
+            var questionnaire = _questionnaireRepo.GetById(1).Result;
+            var questions = _questionRepo.GetQuestionsByQuestionnaireId(1).Result;
 
             var model = new QuestionnaireViewModel
             {
                 Name = questionnaire.Name,
                 Fields = new List<FieldViewModel>()
             };
-            int i = 0;
+            var i = 0;
             foreach (var question in questions)
             {
-                var questionVm = question.Contents;
                 model.Fields.Add(new FieldViewModel
                 {
                     Count = i,
-                    Question = questionVm
+                    Question = question.Contents,
+                    QuestionId = question.Id
                 });
                 i++;
             }
@@ -68,12 +74,20 @@ namespace TherapyQualityController.Controllers
         public ActionResult SendAnswers(IFormCollection form)
         {
 
-            int count = Convert.ToInt32(form["count"]);
-            List<int> answers = new List<int>();
+            var count = Convert.ToInt32(form["count"]);
+            var answers = new List<Answer>();
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                answers.Add(Convert.ToInt32(form[$"opt{i.ToString()}"]));
+                string data = form[$"opt{i.ToString()}"];
+                var dataParsed = data.Split(',');
+                answers.Add(new Answer
+                {
+                    AnswerDate = DateTime.Now,
+                    QuestionId = Convert.ToInt32(dataParsed[0]),
+                    Range = Convert.ToInt32(dataParsed[1])
+
+                });
             }
 
             try
@@ -86,9 +100,5 @@ namespace TherapyQualityController.Controllers
             }
         }
 
-        // new FieldViewModel{
-        //     Count = item.Count,
-        //     Question = item.Question,
-        //     Answer = 1}
-}
+    }
 }

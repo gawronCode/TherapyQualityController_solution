@@ -9,6 +9,6 @@ namespace TherapyQualityController.Models
     {
         public int Count { get; set; }
         public string Question { get; set; }
-        public int Answer { get; set; }
+        public int QuestionId { get; set; }
     }
 }

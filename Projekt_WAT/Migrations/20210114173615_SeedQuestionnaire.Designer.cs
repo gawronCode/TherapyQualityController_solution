@@ -10,8 +10,8 @@ using TherapyQualityController.Data;
 namespace TherapyQualityController.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210112183552_AddSeedDataQuestionnaire")]
-    partial class AddSeedDataQuestionnaire
+    [Migration("20210114173615_SeedQuestionnaire")]
+    partial class SeedQuestionnaire
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
