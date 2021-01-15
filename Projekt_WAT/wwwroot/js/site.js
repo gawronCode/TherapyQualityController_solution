@@ -2,3 +2,11 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+
+$(document).on('click', '#addNewQuestionnaire', function () {
+    $('#addNewQuestionnaireDiv').toggle();
+});
+
+$(document).on('click', '#addNewQuestion', function () {
+    $('#addNewQuestionDiv').toggle();
+});

@@ -1,5 +1,47 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using System.Linq
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using TherapyQualityController.Models
+@model IEnumerable<TherapyQualityController.Models.QuestionnaireViewModel>
+
 @{
+    ViewData["Title"] = "Index";
 }
+
+<div class="container">
+    <div class="row">
+        <h1>Liczba dostępnych ankiet @Model.Count().ToString() </h1>
+    </div>
+    <div class="row" style="margin-bottom: 30px">
+        <h3>Spis ankiet:</h3>
+    </div>
+    
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="media">
+                <div class="media-body">
+                    <h4 class="mt-0">@item.Name</h4>
+                    <small><a asp-action="ManageQuestions" asp-route-id="@item.Id" class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Edytor pytań</a></small>
+                    <small><a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Zmień nazwę</a></small>
+                    <small><a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" role="button" style="margin-top: 10px">Usuń ankietę</a></small>
+                </div>
+            </div>
+        </div>
+        <hr>
+    }
+    
+    <div class="row" style="margin-top: 50px"><a href="#" id="addNewQuestionnaire" class="btn btn-dark">Dodaj nową ankietę</a> </div>
+
+    <div class="row">
+    <div class="rounded" id="addNewQuestionnaireDiv" style="display: none; margin-top: 30px; background-color: gainsboro; width: 420px; padding: 10px">
+        <form asp-action="CreateQuestionnaire" method="post">
+            <div class="form-group">
+                <input class="form-control" name="questionnaireName" id="newQuestionnaire" placeholder="Tytuł nowej ankiety" style="width: 400px">
+            </div>
+            <input type="submit" value="Stwórz ankietę" button class="btn btn-dark">
+        </form>
+    </div>
+    </div>
+
+
+</div>

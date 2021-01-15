@@ -28,7 +28,7 @@ namespace TherapyQualityController.Controllers
 
         }
 
-        // GET: QuestionnaireManagerController
+        
         public ActionResult Index()
         {
             var questionnaires = _questionnaireRepo.GetAll().Result;
@@ -47,32 +47,67 @@ namespace TherapyQualityController.Controllers
             return View(model);
         }
 
-        // GET: QuestionnaireManagerController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult ManageQuestions(int id)
         {
-            return View();
+            
+            var questionnaire = _questionnaireRepo.GetById(id).Result;
+            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+
+            var model = new QuestionnaireViewModel
+            {
+                Id = id,
+                Name = questionnaire.Name,
+                Fields = new List<FieldViewModel>()
+            };
+            var i = 0;
+            foreach (var question in questions)
+            {
+                model.Fields.Add(new FieldViewModel
+                {
+                    Count = i,
+                    Question = question.Contents,
+                    QuestionId = question.Id
+                });
+                i++;
+            }
+            
+            return View(model);
+        }
+        
+        
+        public ActionResult CreateQuestionnaire(string questionnaireName)
+        {
+
+            if (questionnaireName == string.Empty || questionnaireName is null) return RedirectToAction(nameof(Index));
+
+            var newQuestionnaire = new Questionnaire
+            {
+                CreationDate = DateTime.Now,
+                Name = questionnaireName
+            };
+
+            _questionnaireRepo.Create(newQuestionnaire);
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: QuestionnaireManagerController/Create
-        public ActionResult Create()
+
+        public ActionResult AddQuestionToQuestionnaire(string questionContent, int questionnaireId)
         {
-            return View();
+            
+            if (questionContent == string.Empty || questionContent is null) return RedirectToAction("ManageQuestions", new { id = questionnaireId });
+
+            var newQuestion = new Question
+            {
+                Contents = questionContent,
+                QuestionnaireId = questionnaireId
+            };
+
+            int id = questionnaireId;
+
+            _questionRepo.Create(newQuestion).Wait();
+            return RedirectToAction("ManageQuestions", new{id=id});
         }
 
-        // POST: QuestionnaireManagerController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         // GET: QuestionnaireManagerController/Edit/5
         public ActionResult Edit(int id)

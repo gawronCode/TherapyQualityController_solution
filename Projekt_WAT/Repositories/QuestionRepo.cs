@@ -17,9 +17,10 @@ namespace TherapyQualityController.Repositories
             _context = context;
         }
 
-        public Task<bool> Create(Question entity)
+        public async Task<bool> Create(Question entity)
         {
-            throw new NotImplementedException();
+            await _context.Questions.AddAsync(entity);
+            return await Save();
         }
 
         public Task<bool> Delete(Question entity)
@@ -48,9 +49,10 @@ namespace TherapyQualityController.Repositories
             return questions;
         }
 
-        public Task<bool> Save()
+        public async Task<bool> Save()
         {
-            throw new NotImplementedException();
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
         }
 
         public Task<bool> Update(Question entity)
