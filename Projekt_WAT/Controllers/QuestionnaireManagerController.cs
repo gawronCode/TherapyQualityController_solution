@@ -86,10 +86,32 @@ namespace TherapyQualityController.Controllers
                 Name = questionnaireName
             };
 
-            _questionnaireRepo.Create(newQuestionnaire);
+            _questionnaireRepo.Create(newQuestionnaire).Wait();
             return RedirectToAction(nameof(Index));
         }
 
+        //Todo dokończyć to xD Zmiana nazwy ankiety
+        // public ActionResult RenameQuestionnaire(int id, string newName)
+        // {
+        //     var questionnaire = _questionnaireRepo.GetById(id).Result;
+        //     questionnaire.Name = newName;
+        //     _questionnaireRepo.Update(questionnaire).Wait();
+        //     return RedirectToAction(nameof(Index));
+        // }
+
+        public ActionResult RemoveQuestionnaire(int id)
+        {
+            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+
+            foreach (var question in questions)
+            {
+                _questionRepo.Delete(question);
+            }
+
+            var questionnaire = _questionnaireRepo.GetById(id).Result;
+            _questionnaireRepo.Delete(questionnaire).Wait();
+            return RedirectToAction(nameof(Index));
+        }
 
         public ActionResult AddQuestionToQuestionnaire(string questionContent, int questionnaireId)
         {
@@ -101,11 +123,17 @@ namespace TherapyQualityController.Controllers
                 Contents = questionContent,
                 QuestionnaireId = questionnaireId
             };
-
-            int id = questionnaireId;
-
+            
             _questionRepo.Create(newQuestion).Wait();
-            return RedirectToAction("ManageQuestions", new{id=id});
+            return RedirectToAction("ManageQuestions", new{id=questionnaireId});
+        }
+
+        public ActionResult RemoveQuestionFromQuestionnaire(int id)
+        {
+            var question = _questionRepo.GetById(id).Result;
+            var questionnaireId = question.QuestionnaireId;
+            _questionRepo.Delete(question).Wait();
+            return RedirectToAction("ManageQuestions", new { id = questionnaireId });
         }
 
 

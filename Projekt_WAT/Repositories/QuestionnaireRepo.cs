@@ -24,9 +24,10 @@ namespace TherapyQualityController.Repositories
             return await Save();
         }
 
-        public Task<bool> Delete(Questionnaire entity)
+        public async Task<bool> Delete(Questionnaire entity)
         {
-            throw new NotImplementedException();
+            _context.Questionnaires.Remove(entity);
+            return await Save();
         }
 
         public Task<bool> Exists(int id)
@@ -52,9 +53,10 @@ namespace TherapyQualityController.Repositories
             return changes > 0;
         }
 
-        public Task<bool> Update(Questionnaire entity)
+        public async Task<bool> Update(Questionnaire entity)
         {
-            throw new NotImplementedException();
+            _context.Update(entity);
+            return await Save();
         }
     }
 }
