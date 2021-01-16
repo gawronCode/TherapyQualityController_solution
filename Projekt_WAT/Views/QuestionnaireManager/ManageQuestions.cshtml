@@ -41,10 +41,162 @@
 </div>
 
     <div class="row">
-        <div class="rounded" id="addNewQuestionDiv" style="display: none; margin-top: 30px; background-color: gainsboro; width: 420px; padding: 10px">
+        <div class="rounded" id="addNewQuestionDiv" style="display: none; margin-top: 30px; background-color: gainsboro; width: 520px; padding: 10px">
             <form asp-action="AddQuestionToQuestionnaire" method="post">
                 <div class="form-group">
-                    <input class="form-control" name="questionContent" id="newQuestionnaire" placeholder="Wpisz nowe pytanie" style="width: 400px">
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="questionContent" id="newQuestionnaire" placeholder="Wpisz nowe pytanie" style="width: 500px">
+                    </div>
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="answer_1" id="answer_1" placeholder="Odpowiedź 1" style="width: 400px; margin-top: 5px">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle mr-4" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" style="height: 37px; width: 95px ;margin-top: 5px; margin-left: 5px">
+                            Wartość
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_1" id="inlineRadio1" value=1>
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_1" id="inlineRadio2" value=2>
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_1" id="inlineRadio3" value=3>
+                                <label class="form-check-label" for="inlineRadio3">3</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_1" id="inlineRadio4" value=4>
+                                <label class="form-check-label" for="inlineRadio4">4</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_1" id="inlineRadio5" value=5>
+                                <label class="form-check-label" for="inlineRadio5">5</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="answer_1" id="answer_1" placeholder="Odpowiedź 2" style="width: 400px; margin-top: 5px">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle mr-4" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" style="height: 37px; width: 95px ;margin-top: 5px; margin-left: 5px">
+                            Wartość
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_2" id="inlineRadio1" value=1>
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_2" id="inlineRadio2" value=2>
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_2" id="inlineRadio3" value=3>
+                                <label class="form-check-label" for="inlineRadio3">3</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_2" id="inlineRadio4" value=4>
+                                <label class="form-check-label" for="inlineRadio4">4</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_2" id="inlineRadio5" value=5>
+                                <label class="form-check-label" for="inlineRadio5">5</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="answer_1" id="answer_1" placeholder="Odpowiedź 3" style="width: 400px; margin-top: 5px">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle mr-4" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" style="height: 37px; width: 95px ;margin-top: 5px; margin-left: 5px">
+                            Wartość
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_3" id="inlineRadio1" value=1>
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_3" id="inlineRadio2" value=2>
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_3" id="inlineRadio3" value=3>
+                                <label class="form-check-label" for="inlineRadio3">3</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_3" id="inlineRadio4" value=4>
+                                <label class="form-check-label" for="inlineRadio4">4</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_3" id="inlineRadio5" value=5>
+                                <label class="form-check-label" for="inlineRadio5">5</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="answer_1" id="answer_1" placeholder="Odpowiedź 4" style="width: 400px; margin-top: 5px">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle mr-4" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" style="height: 37px; width: 95px ;margin-top: 5px; margin-left: 5px">
+                            Wartość
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_4" id="inlineRadio1" value=1>
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_4" id="inlineRadio2" value=2>
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_4" id="inlineRadio3" value=3>
+                                <label class="form-check-label" for="inlineRadio3">3</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_4" id="inlineRadio4" value=4>
+                                <label class="form-check-label" for="inlineRadio4">4</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_4" id="inlineRadio5" value=5>
+                                <label class="form-check-label" for="inlineRadio5">5</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="custom-control-inline">
+                        <input class="form-control" name="answer_1" id="answer_1" placeholder="Odpowiedź 5" style="width: 400px; margin-top: 5px">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle mr-4" type="button" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" style="height: 37px; width: 95px ;margin-top: 5px; margin-left: 5px">
+                            Wartość
+                        </button>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_5" id="inlineRadio1" value=1>
+                                <label class="form-check-label" for="inlineRadio1">1</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_5" id="inlineRadio2" value=2>
+                                <label class="form-check-label" for="inlineRadio2">2</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_5" id="inlineRadio3" value=3>
+                                <label class="form-check-label" for="inlineRadio3">3</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_5" id="inlineRadio4" value=4>
+                                <label class="form-check-label" for="inlineRadio4">4</label>
+                            </div>
+                            <div class="dropdown-item form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="val_5" id="inlineRadio5" value=5>
+                                <label class="form-check-label" for="inlineRadio5">5</label>
+                            </div>
+                        </div>
+                    </div>
+
                     <input class="form-control" name="questionnaireId" value=@Model.Id style="display: none">
                 </div>
                 <input type="submit" value="Dodaj" button class="btn btn-dark">
