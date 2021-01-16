@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using TherapyQualityController.Models.ViewModels;
 using TherapyQualityController.Repositories.IRepos;
@@ -16,16 +17,19 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
+        private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
 
         public QuestionnairePatientAllocationController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
-            IAnswerRepo answerRepo)
+            IAnswerRepo answerRepo,
+            IPatientQuestionnaireRepo patientQuestionnaireRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
             _answerRepo = answerRepo;
+            _patientQuestionnaireRepo = patientQuestionnaireRepo;
         }
 
 
@@ -34,16 +38,35 @@ namespace TherapyQualityController.Controllers
         public ActionResult Index()
         {
             var patients = _userRepo.GetAll().Result;
-
             var model = (from patient in patients where string.IsNullOrEmpty(patient.PWZ) && !string.IsNullOrEmpty(patient.PESEL) select new PatientViewModel {EmailAddress = patient.Email, FirstName = patient.FirstName, LastName = patient.LastName, PESEL = patient.PESEL}).ToList();
-
             return View(model);
         }
 
         public ActionResult ManagePatientQuestionnaires(string id)
         {
 
-            return View();
+            var patientQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id).Result;
+            var patientQuestionnaireViewModels = patientQuestionnaires.Select(patientQuestionnaire => new PatientQuestionnaireViewModel {PatientEmail = patientQuestionnaire.PatientEmail, QuestionnaireId = patientQuestionnaire.QuestionnaireId}).ToList();
+
+            var questionnaires = _questionnaireRepo.GetAll().Result;
+            var questionnaireViewModels = questionnaires.Select(questionnaire => new QuestionnaireViewModel { Fields = null, Id = questionnaire.Id, Name = questionnaire.Name }).ToList();
+
+            foreach (var item in patientQuestionnaireViewModels)
+            {
+                item.QuestionnaireName = _questionnaireRepo.GetById(item.QuestionnaireId).Result.Name;
+                if (questionnaireViewModels.Any(x => x.Id == item.QuestionnaireId))
+                    questionnaireViewModels.Remove(
+                        questionnaireViewModels.FirstOrDefault(q => q.Id == item.QuestionnaireId));
+            }
+
+            var model = new PatientQuestionnaireManagerViewModel
+            {
+                patientEmail = id,
+                PatientQuestionnaires = patientQuestionnaireViewModels,
+                Questionnaires = questionnaireViewModels
+            };
+
+            return View(model);
         }
 
         // GET: QuestionnairePatientAllocationController/Details/5

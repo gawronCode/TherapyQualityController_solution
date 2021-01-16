@@ -20,7 +20,7 @@ namespace TherapyQualityController.Repositories.Repos
 
         public Task<bool> Create(User entity)
         {
-            
+            throw new NotImplementedException();
         }
 
         public Task<bool> Delete(User entity)
