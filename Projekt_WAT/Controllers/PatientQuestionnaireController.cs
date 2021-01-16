@@ -37,34 +37,41 @@ namespace TherapyQualityController.Controllers
         public ActionResult Index()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var userQuestionnaireId = _userRepo.GetPatientQuestionnaireIdByEmail(userEmail).Result;
-            
-            QuestionnaireViewModel model = null;
+            var userQuestionnaireId = _userRepo.GetUserQuestionnairesIdByEmail(userEmail).Result;
 
-            if (userQuestionnaireId > 0)
+            var questionnaires = userQuestionnaireId.Select(id => _questionnaireRepo.GetById(id).Result).ToList();
+
+            var model = questionnaires.Select(questionnaire => new QuestionnaireViewModel {Fields = null, Id = questionnaire.Id, Name = questionnaire.Name}).ToList();
+
+            return View(model);
+        }
+
+        public ActionResult FillQuestionnaire(int id)
+        {
+
+            var questionnaire = _questionnaireRepo.GetById(id).Result;
+            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+
+
+            var model = new QuestionnaireViewModel
             {
-                var questionnaire = _questionnaireRepo.GetById(userQuestionnaireId).Result;
-                var questions = _questionRepo.GetQuestionsByQuestionnaireId(userQuestionnaireId).Result;
-
-                model = new QuestionnaireViewModel
+                Name = questionnaire.Name,
+                Fields = new List<FieldViewModel>()
+            };
+            var i = 0;
+            foreach (var question in questions)
+            {
+                model.Fields.Add(new FieldViewModel
                 {
-                    Name = questionnaire.Name,
-                    Fields = new List<FieldViewModel>()
-                };
-                var i = 0;
-                foreach (var question in questions)
-                {
-                    model.Fields.Add(new FieldViewModel
-                    {
-                        Count = i,
-                        Question = question.Contents,
-                        QuestionId = question.Id
-                    });
-                    i++;
-                }
+                    Count = i,
+                    Question = question.Contents,
+                    QuestionId = question.Id
+                });
+                i++;
             }
 
             return View(model);
+
         }
 
         // GET: PatientQuestionnaireController/Create
@@ -80,17 +87,17 @@ namespace TherapyQualityController.Controllers
         {
 
             var count = Convert.ToInt32(form["count"]);
-            var answers = new List<Answer>();
+            var answers = new List<UserAnswer>();
 
             for (var i = 0; i < count; i++)
             {
                 string data = form[$"opt{i.ToString()}"];
                 var dataParsed = data.Split(',');
-                answers.Add(new Answer
+                answers.Add(new UserAnswer
                 {
                     AnswerDate = DateTime.Now,
                     QuestionId = Convert.ToInt32(dataParsed[0]),
-                    Range = Convert.ToInt32(dataParsed[1])
+                    Value = Convert.ToInt32(dataParsed[1])
 
                 });
             }

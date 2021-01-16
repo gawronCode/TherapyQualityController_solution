@@ -225,21 +225,20 @@ namespace TherapyQualityController.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Answer", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.Answer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
-                    b.Property<DateTime?>("AnswerDate")
-                        .IsRequired()
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Range")
+                    b.Property<int>("Value")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -249,7 +248,7 @@ namespace TherapyQualityController.Migrations
                     b.ToTable("Answers");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Question", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.Question", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -270,7 +269,7 @@ namespace TherapyQualityController.Migrations
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Questionnaire", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.Questionnaire", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,7 +289,52 @@ namespace TherapyQualityController.Migrations
                     b.ToTable("Questionnaires");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.User", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.UserAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime?>("AnswerDate")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.ToTable("UserAnswers");
+                });
+
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.UserQuestionnaire", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("PatientEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("QuestionnaireId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserQuestionnaires");
+                });
+
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.User", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -312,11 +356,6 @@ namespace TherapyQualityController.Migrations
 
                     b.Property<string>("PWZ")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("QuestionnaireId")
-                        .HasColumnType("int");
-
-                    b.HasIndex("QuestionnaireId");
 
                     b.HasDiscriminator().HasValue("User");
                 });
@@ -372,9 +411,9 @@ namespace TherapyQualityController.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Answer", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.Answer", b =>
                 {
-                    b.HasOne("TherapyQualityController.Models.Question", "Question")
+                    b.HasOne("TherapyQualityController.Models.DbModels.Question", "Question")
                         .WithMany()
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -383,9 +422,9 @@ namespace TherapyQualityController.Migrations
                     b.Navigation("Question");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.Question", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.Question", b =>
                 {
-                    b.HasOne("TherapyQualityController.Models.Questionnaire", "Questionnaire")
+                    b.HasOne("TherapyQualityController.Models.DbModels.Questionnaire", "Questionnaire")
                         .WithMany()
                         .HasForeignKey("QuestionnaireId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -394,13 +433,15 @@ namespace TherapyQualityController.Migrations
                     b.Navigation("Questionnaire");
                 });
 
-            modelBuilder.Entity("TherapyQualityController.Models.User", b =>
+            modelBuilder.Entity("TherapyQualityController.Models.DbModels.UserAnswer", b =>
                 {
-                    b.HasOne("TherapyQualityController.Models.Questionnaire", "Questionnaire")
+                    b.HasOne("TherapyQualityController.Models.DbModels.Question", "Question")
                         .WithMany()
-                        .HasForeignKey("QuestionnaireId");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Questionnaire");
+                    b.Navigation("Question");
                 });
 #pragma warning restore 612, 618
         }

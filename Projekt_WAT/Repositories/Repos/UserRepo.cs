@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TherapyQualityController.Data;
@@ -42,11 +43,20 @@ namespace TherapyQualityController.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public async Task<int> GetPatientQuestionnaireIdByEmail(string email)
+        public async Task<ICollection<int>> GetUserQuestionnairesIdByEmail(string email)
         {
-            var patient = await _context.Patients.FirstOrDefaultAsync(q => q.Email == email);
-            int questionnaireId = patient.QuestionnaireId ?? default(int);
-            return questionnaireId;
+            var patient = await _context.AppUsers.FirstOrDefaultAsync(q => q.Email == email);
+            var userQuestionnaires = _context.UserQuestionnaires.Where(q => q.PatientEmail == email);
+            var questionnairesId = new List<int>();
+
+            foreach (var userQuestionnaire in userQuestionnaires)
+            {
+                questionnairesId.Add(userQuestionnaire.QuestionnaireId);
+            }
+            
+
+            
+            return questionnairesId;
         }
 
         public Task<bool> Save()

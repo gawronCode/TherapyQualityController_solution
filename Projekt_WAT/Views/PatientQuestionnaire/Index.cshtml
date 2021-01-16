@@ -1,71 +1,38 @@
 ﻿@using System.Linq
 @using Microsoft.CodeAnalysis.CSharp.Syntax
 @using TherapyQualityController.Models
-@model TherapyQualityController.Models.ViewModels.QuestionnaireViewModel
+@model IEnumerable<TherapyQualityController.Models.ViewModels.QuestionnaireViewModel>
 
 @{
     ViewData["Title"] = "Index";
 }
 
-@if (!(Model is null))
-{
 
-    <h1>@Model.Name</h1>
-
+@if(Model.Count()>0){
     <div class="container">
         <div class="row">
-            <h3>Liczba pytań: @Model.Fields.Count.ToString()</h3>
+            <h1>Liczba dostępnych do rozwiązania ankiet @Model.Count().ToString() </h1>
         </div>
-        <hr>
-        <div class="row" id="answers">
-            <form asp-action="SendAnswers" method="post">
-                @foreach (var item in Model.Fields)
-                {
+        <div class="row" style="margin-bottom: 30px">
+            <h3>Spis ankiet:</h3>
+        </div>
 
-                    <div class="media">
-
-                        <div class="media-body">
-
-                            <div>
-                                <h5 class="mt-0">@item.Question</h5>
-                            </div>
-
-                            <div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},1")>
-                                    <label class="form-check-label" for="inlineRadio">1</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},2")>
-                                    <label class="form-check-label" for="inlineRadio">2</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},3")>
-                                    <label class="form-check-label" for="inlineRadio">3</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},4")>
-                                    <label class="form-check-label" for="inlineRadio">4</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},5")>
-                                    <label class="form-check-label" for="inlineRadio">5</label>
-                                </div>
-                            </div>
-
-                        </div>
-
+        @foreach (var item in Model)
+        {
+            <div class="row">
+                <div class="media">
+                    <div class="media-body">
+                        <h4 class="mt-0">@item.Name</h4>
+                        <small><a asp-action="FillQuestionnaire" asp-route-id="@item.Id" class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Rozwiąż ankietę</a></small>
                     </div>
-                    <hr>
-                }
-                <button id="sendBtn" class="btn btn-dark btn-lg" type="submit" name="count" value=@Model.Fields.Count style="margin-top: 10px; color: white;">Prześlij</button>
-            </form>
-        </div>
-
+                </div>
+            </div>
+            <hr>
+        }
+        
     </div>
-
 }
 else
 {
-    <h2>Wygląda na to że nie masz żadnych ankiet do wypełnienia!</h2>
+    <h1>Wygląda na to że nie masz przydzielonej żadnej ankiety</h1>
 }

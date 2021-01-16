@@ -15,8 +15,6 @@ namespace TherapyQualityController.Models.DbModels
         public string PWZ { get; set; }
         [Required]
         public DateTime? DateOfBirth { get; set; }
-        public int? QuestionnaireId { get; set; }
-        public Questionnaire Questionnaire { get; set; }
-
+        
     }
 }

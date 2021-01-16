@@ -12,10 +12,12 @@ namespace TherapyQualityController.Data
         {
         }
 
-        public DbSet<User> Patients { get; set; }
+        public DbSet<User> AppUsers { get; set; }
         public DbSet<Questionnaire> Questionnaires { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Answer> Answers { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
+        public DbSet<UserQuestionnaire> UserQuestionnaires { get; set; }
 
 
     }
