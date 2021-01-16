@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController.Areas.Identity.Pages.Account
 {

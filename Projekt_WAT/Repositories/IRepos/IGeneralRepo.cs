@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace TherapyQualityController.Repositories
+namespace TherapyQualityController.Repositories.IRepos
 {
     public interface IGeneralRepo<T> where T : class
     {

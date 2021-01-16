@@ -1,4 +1,4 @@
-namespace TherapyQualityController.Models
+namespace TherapyQualityController.Models.ViewModels
 {
     public class ErrorViewModel
     {

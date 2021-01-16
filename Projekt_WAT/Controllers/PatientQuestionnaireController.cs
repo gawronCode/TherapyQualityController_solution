@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
+using TherapyQualityController.Models.ViewModels;
 using TherapyQualityController.Repositories;
+using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Controllers
 {
@@ -18,15 +21,15 @@ namespace TherapyQualityController.Controllers
 
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
-        private readonly IPatientRepo _patientRepo;
+        private readonly IUserRepo _userRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            IPatientRepo patientRepo)
+            IUserRepo userRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
-            _patientRepo = patientRepo;
+            _userRepo = userRepo;
 
         }
 
@@ -34,7 +37,7 @@ namespace TherapyQualityController.Controllers
         public ActionResult Index()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var userQuestionnaireId = _patientRepo.GetPatientQuestionnaireIdByEmail(userEmail).Result;
+            var userQuestionnaireId = _userRepo.GetPatientQuestionnaireIdByEmail(userEmail).Result;
             
             QuestionnaireViewModel model = null;
 

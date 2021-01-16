@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
 
-namespace TherapyQualityController.Repositories
+namespace TherapyQualityController.Repositories.IRepos
 {
     public interface IQuestionRepo : IGeneralRepo<Question>
     {

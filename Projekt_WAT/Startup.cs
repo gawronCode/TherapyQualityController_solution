@@ -7,7 +7,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TherapyQualityController.Data;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Repositories;
+using TherapyQualityController.Repositories.IRepos;
+using TherapyQualityController.Repositories.Repos;
 
 namespace TherapyQualityController
 {
@@ -37,7 +40,7 @@ namespace TherapyQualityController
 
             services.AddScoped<IQuestionnaireRepo, QuestionnaireRepo>();
             services.AddScoped<IQuestionRepo, QuestionRepo>();
-            services.AddScoped<IPatientRepo, PatientRepo>();
+            services.AddScoped<IUserRepo, UserRepo>();
 
             services.Configure<IdentityOptions>(options =>
             {

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TherapyQualityController.Data;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
+using TherapyQualityController.Repositories.IRepos;
 
-namespace TherapyQualityController.Repositories
+namespace TherapyQualityController.Repositories.Repos
 {
     public class QuestionnaireRepo : IQuestionnaireRepo
     {

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.ViewModels;
 
 namespace TherapyQualityController.Controllers
 {

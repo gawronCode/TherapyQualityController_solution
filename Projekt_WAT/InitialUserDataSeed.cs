@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using TherapyQualityController.Models;
+using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController
 {
