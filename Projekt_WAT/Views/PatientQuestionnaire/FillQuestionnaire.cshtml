@@ -30,26 +30,15 @@
                         </div>
 
                         <div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},1")>
-                                <label class="form-check-label" for="inlineRadio">1</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},2")>
-                                <label class="form-check-label" for="inlineRadio">2</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},3")>
-                                <label class="form-check-label" for="inlineRadio">3</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},4")>
-                                <label class="form-check-label" for="inlineRadio">4</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},5")>
-                                <label class="form-check-label" for="inlineRadio">5</label>
-                            </div>
+
+                            @foreach (var answer in item.Answers)
+                            {
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name=@($"opt{item.Count.ToString()}") id="inlineRadio" value=@($"{item.QuestionId},{answer.Value}")>
+                                    <label class="form-check-label" for="inlineRadio">@answer.Content</label>
+                                </div>
+                            }
+
                         </div>
 
                     </div>
@@ -57,7 +46,8 @@
                 </div>
                 <hr>
             }
-            <button id="sendBtn" class="btn btn-dark btn-lg" type="submit" name="count" value=@Model.Fields.Count style="margin-top: 10px; color: white;">Prześlij</button>
+            <button id="sendBtn" class="btn btn-dark" type="submit" name="count" value=@Model.Fields.Count style="margin-top: 10px; color: white; width: 200px">Prześlij</button>
+            <a asp-action="Index" class="btn btn-danger" style="margin-top: 10px; margin-left: 10px; width: 200px">Anuluj</a>
         </form>
     </div>
 

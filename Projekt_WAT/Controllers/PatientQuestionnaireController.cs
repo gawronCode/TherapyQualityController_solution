@@ -22,14 +22,17 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
+        private readonly IAnswerRepo _answerRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            IUserRepo userRepo)
+            IUserRepo userRepo,
+            IAnswerRepo answerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
+            _answerRepo = answerRepo;
 
         }
 
@@ -51,7 +54,7 @@ namespace TherapyQualityController.Controllers
 
             var questionnaire = _questionnaireRepo.GetById(id).Result;
             var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
-
+            
 
             var model = new QuestionnaireViewModel
             {
@@ -61,11 +64,15 @@ namespace TherapyQualityController.Controllers
             var i = 0;
             foreach (var question in questions)
             {
+                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                var answerViewModels = answers.Select(answer => new AnswerViewModel { Content = answer.Content, Value = answer.Value }).ToList();
+
                 model.Fields.Add(new FieldViewModel
                 {
                     Count = i,
                     Question = question.Contents,
-                    QuestionId = question.Id
+                    QuestionId = question.Id,
+                    Answers = answerViewModels
                 });
                 i++;
             }
@@ -74,42 +81,48 @@ namespace TherapyQualityController.Controllers
 
         }
 
-        // GET: PatientQuestionnaireController/Create
-        public ActionResult SendAnswers()
-        {
-            return RedirectToAction(nameof(Index));
-        }
-
-        // POST: PatientQuestionnaireController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        
         public ActionResult SendAnswers(IFormCollection form)
         {
 
             var count = Convert.ToInt32(form["count"]);
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var answers = new List<UserAnswer>();
 
             for (var i = 0; i < count; i++)
             {
+                
                 string data = form[$"opt{i.ToString()}"];
+
+                if(data is null || data == string.Empty) return RedirectToAction(nameof(ErrorInfo));
+
                 var dataParsed = data.Split(',');
                 answers.Add(new UserAnswer
                 {
                     AnswerDate = DateTime.Now,
                     QuestionId = Convert.ToInt32(dataParsed[0]),
-                    Value = Convert.ToInt32(dataParsed[1])
+                    Value = Convert.ToInt32(dataParsed[1]),
+                    UserEmail = userEmail
 
                 });
+            
+                
+                
+                
             }
 
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return RedirectToAction(nameof(Index));
-            }
+            return RedirectToAction(nameof(SuccessInfo));
+            
+        }
+
+        public ActionResult SuccessInfo()
+        {
+            return View();
+        }
+
+        public ActionResult ErrorInfo()
+        {
+            return View();
         }
 
     }

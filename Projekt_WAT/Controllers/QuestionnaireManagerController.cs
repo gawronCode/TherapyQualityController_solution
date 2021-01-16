@@ -20,15 +20,17 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
+        private readonly IAnswerRepo _answerRepo;
 
         public QuestionnaireManagerController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            IUserRepo userRepo)
+            IUserRepo userRepo,
+            IAnswerRepo answerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
-
+            _answerRepo = answerRepo;
         }
 
         
@@ -65,11 +67,15 @@ namespace TherapyQualityController.Controllers
             var i = 0;
             foreach (var question in questions)
             {
+                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                var answerViewModels = answers.Select(answer => new AnswerViewModel {Content = answer.Content, Value = answer.Value}).ToList();
+
                 model.Fields.Add(new FieldViewModel
                 {
                     Count = i,
                     Question = question.Contents,
-                    QuestionId = question.Id
+                    QuestionId = question.Id,
+                    Answers = answerViewModels
                 });
                 i++;
             }
@@ -108,7 +114,7 @@ namespace TherapyQualityController.Controllers
 
             foreach (var question in questions)
             {
-                _questionRepo.Delete(question);
+                _questionRepo.Delete(question).Wait();
             }
 
             var questionnaire = _questionnaireRepo.GetById(id).Result;
@@ -116,7 +122,12 @@ namespace TherapyQualityController.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public ActionResult AddQuestionToQuestionnaire(string questionContent, int questionnaireId)
+        public ActionResult AddQuestionToQuestionnaire(string questionContent, int questionnaireId,
+                                                        string answer1, int val1,
+                                                        string answer2, int val2,
+                                                        string answer3, int val3,
+                                                        string answer4, int val4,
+                                                        string answer5, int val5)
         {
             
             if (questionContent == string.Empty || questionContent is null) return RedirectToAction("ManageQuestions", new { id = questionnaireId });
@@ -128,6 +139,38 @@ namespace TherapyQualityController.Controllers
             };
             
             _questionRepo.Create(newQuestion).Wait();
+
+            _answerRepo.Create(new Answer
+            {
+                Content = answer1,
+                Value = val1,
+                QuestionId = newQuestion.Id
+            }).Wait();
+            _answerRepo.Create(new Answer
+            {
+                Content = answer2,
+                Value = val2,
+                QuestionId = newQuestion.Id
+            }).Wait();
+            _answerRepo.Create(new Answer
+            {
+                Content = answer3,
+                Value = val3,
+                QuestionId = newQuestion.Id
+            }).Wait();
+            _answerRepo.Create(new Answer
+            {
+                Content = answer4,
+                Value = val4,
+                QuestionId = newQuestion.Id
+            }).Wait();
+            _answerRepo.Create(new Answer
+            {
+                Content = answer5,
+                Value = val5,
+                QuestionId = newQuestion.Id
+            }).Wait();
+
             return RedirectToAction("ManageQuestions", new{id=questionnaireId});
         }
 
