@@ -1,0 +1,35 @@
+﻿@using System.Linq
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using TherapyQualityController.Models
+@model IEnumerable<TherapyQualityController.Models.ViewModels.PatientViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container">
+    <div class="row">
+        <h1>Liczba zarejestrowanych pacjetów: @Model.Count().ToString() </h1>
+    </div>
+    <div class="row" style="margin-bottom: 30px">
+        <h3>Spis pacjentów:</h3>
+    </div>
+
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="media">
+                <div class="media-body">
+                    <h4 class="mt-0">Imię: @item.FirstName</h4>
+                    <h4 class="mt-0">Nazwisko: @item.LastName</h4>
+                    <h4 class="mt-0">Adres email: @item.EmailAddress</h4>
+                    <h4 class="mt-0">PESEL: @item.PESEL</h4>
+                    <small><a asp-action="ManagePatientQuestionnaires" asp-route-id="@item.EmailAddress" class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Przydziel ankietę</a></small>
+                </div>
+            </div>
+        </div>
+        <hr>
+    }
+    
+
+</div>

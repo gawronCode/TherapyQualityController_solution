@@ -20,7 +20,7 @@ namespace TherapyQualityController.Repositories.Repos
 
         public Task<bool> Create(User entity)
         {
-            throw new NotImplementedException();
+            
         }
 
         public Task<bool> Delete(User entity)
@@ -33,9 +33,10 @@ namespace TherapyQualityController.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public Task<ICollection<User>> GetAll()
+        public async Task<ICollection<User>> GetAll()
         {
-            throw new NotImplementedException();
+            var users = await _context.AppUsers.ToListAsync();
+            return users;
         }
 
         public Task<User> GetById(int id)

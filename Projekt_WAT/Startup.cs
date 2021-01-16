@@ -42,6 +42,7 @@ namespace TherapyQualityController
             services.AddScoped<IQuestionRepo, QuestionRepo>();
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<IAnswerRepo, AnswerRepo>();
+            services.AddScoped<IPatientQuestionnaireRepo, PatientQuestionnaireRepo>();
 
             services.Configure<IdentityOptions>(options =>
             {

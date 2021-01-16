@@ -1,0 +1,15 @@
+﻿@model int
+
+@{
+    ViewData["Title"] = "ErrorInfo";
+}
+
+<div class="d-flex justify-content-center" style="margin-top: 50px">
+    <h2 style="text-align: center">Nie wszystkie pola zostały uzupełnione, dodanie pytania nie powiodło się</h2>
+</div>
+<div class="d-flex justify-content-center" style="margin-top: 10px">
+    <form asp-action="ManageQuestions">
+        <input type="submit" class="btn btn-secondary" style="margin-top: 10px; margin-left: 10px; width: 200px" value="Powrót">
+        <input name="id" value=@Model style="display: none" />
+    </form>
+</div>

@@ -111,9 +111,16 @@ namespace TherapyQualityController.Controllers
         public ActionResult RemoveQuestionnaire(int id)
         {
             var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+            
 
             foreach (var question in questions)
             {
+                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                foreach (var answer in answers)
+                {
+                    _answerRepo.Delete(answer).Wait();
+                }
+
                 _questionRepo.Delete(question).Wait();
             }
 
@@ -130,8 +137,15 @@ namespace TherapyQualityController.Controllers
                                                         string answer5, int val5)
         {
             
-            if (questionContent == string.Empty || questionContent is null) return RedirectToAction("ManageQuestions", new { id = questionnaireId });
+            if (questionContent == string.Empty || questionContent is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (answer1 == string.Empty || answer1 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (answer2 == string.Empty || answer2 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (answer3 == string.Empty || answer3 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (answer4 == string.Empty || answer4 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (answer5 == string.Empty || answer5 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
 
+            if(val1 ==0 || val2 == 0 || val3 == 0 || val4 == 0 || val5 == 0) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            
             var newQuestion = new Question
             {
                 Contents = questionContent,
@@ -174,10 +188,20 @@ namespace TherapyQualityController.Controllers
             return RedirectToAction("ManageQuestions", new{id=questionnaireId});
         }
 
+        public ActionResult ErrorInfo(int id)
+        {
+            return View(id);
+        }
+
         public ActionResult RemoveQuestionFromQuestionnaire(int id)
         {
             var question = _questionRepo.GetById(id).Result;
             var questionnaireId = question.QuestionnaireId;
+            var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+            foreach (var answer in answers)
+            {
+                _answerRepo.Delete(answer).Wait();
+            }
             _questionRepo.Delete(question).Wait();
             return RedirectToAction("ManageQuestions", new { id = questionnaireId });
         }
