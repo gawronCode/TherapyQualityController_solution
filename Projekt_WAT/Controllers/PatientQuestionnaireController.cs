@@ -15,7 +15,7 @@ using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Patient, Administrator")]
     public class PatientQuestionnaireController : Controller
     {
 

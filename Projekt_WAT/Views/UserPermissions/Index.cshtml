@@ -1,0 +1,67 @@
+﻿@using System.Linq
+@using Microsoft.CodeAnalysis.CSharp.Syntax
+@using TherapyQualityController.Models
+@using TherapyQualityController.Models.DbModels
+
+@model IEnumerable<TherapyQualityController.Models.ViewModels.DoctorViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container">
+    <div class="row">
+        <h1>Uprawnienia użytkowników</h1>
+    </div>
+    <div class="row" style="margin-bottom: 30px">
+        <h3>Osoby z uprawnieniami lekarza:</h3>
+    </div>
+
+    @foreach (var item in Model)
+    {
+        if (item.IsConfirmed)
+        {
+            <div class="row">
+                <div class="media">
+                    <div class="media-body">
+                        <h4 class="mt-0">Imię: @item.FirstName</h4>
+                        <h4 class="mt-0">Nazwisko: @item.LastName</h4>
+                        <h4 class="mt-0">Adres email: @item.EmailAddress</h4>
+                        <h4 class="mt-0">PESEL: @item.PESEL</h4>
+                        <h4 class="mt-0">PWZ: @item.PWZ</h4>
+                        <small><a asp-action="RemovePermissions" asp-route-id="@item.EmailAddress" class="btn btn-danger btn-sm" role="button" style="margin-top: 10px">Odbierz uprawnienia</a></small>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        }
+    }
+
+
+    <div class="row" style="margin-bottom: 30px; margin-top: 60px">
+        <h3>Osoby oczekujące na przyznanie uprawnień:</h3>
+    </div>
+
+
+    @foreach (var item in Model)
+    {
+        if (!item.IsConfirmed)
+        {
+            <div class="row">
+                <div class="media">
+                    <div class="media-body">
+                        <h4 class="mt-0">Imię: @item.FirstName</h4>
+                        <h4 class="mt-0">Nazwisko: @item.LastName</h4>
+                        <h4 class="mt-0">Adres email: @item.EmailAddress</h4>
+                        <h4 class="mt-0">PESEL: @item.PESEL</h4>
+                        <h4 class="mt-0">PWZ: @item.PWZ</h4>
+                        <small><a asp-action="AddPermissions" asp-route-id="@item.EmailAddress" class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Przyznaj uprawnienia</a></small>
+                    </div>
+                </div>
+            </div>
+            <hr>
+        }
+    }
+
+
+</div>

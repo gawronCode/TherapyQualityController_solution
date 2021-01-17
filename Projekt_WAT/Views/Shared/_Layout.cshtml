@@ -29,9 +29,12 @@
                         </li>
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="PatientQuestionnaire" asp-action="Index">Wypełnij ankietę</a>
-                            </li>
+                            if (User.IsInRole("Administrator") || User.IsInRole("Patient"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="PatientQuestionnaire" asp-action="Index">Wypełnij ankietę</a>
+                                </li>
+                            }
                             if (User.IsInRole("Administrator") || User.IsInRole("Doctor"))
                             {
                                 <li class="nav-item dropdown">
@@ -41,14 +44,14 @@
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                         <a class="dropdown-item text-dark" asp-controller="QuestionnaireManager" asp-action="Index">Manager ankiet</a>
                                         <a class="dropdown-item text-dark" asp-controller="QuestionnairePatientAllocation" asp-action="Index">Przydziel ankietę</a>
-                                        <a class="dropdown-item text-dark" href="#">Zobacz wyniki</a>
+                                        <a class="dropdown-item text-dark" asp-controller="QuestionnaireResults" asp-action="Index">Zobacz wyniki</a>
                                     </div>
                                 </li>
                             }
                             if (User.IsInRole("Administrator"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-controller="PatientQuestionnaire" asp-action="Index">Zarządzaj uprawnieniami</a>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="UserPermissions" asp-action="Index">Zarządzaj uprawnieniami</a>
                                 </li>
                             }
                         }

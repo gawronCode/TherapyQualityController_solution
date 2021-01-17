@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace TherapyQualityController.Models.ViewModels
 {
-    public class PatientViewModel
+    public class DoctorViewModel
     {
 
         public string FirstName { get; set; }
@@ -15,6 +15,10 @@ namespace TherapyQualityController.Models.ViewModels
         public string EmailAddress { get; set; }
 
         public string PESEL { get; set; }
+
+        public string PWZ { get; set; }
+
+        public bool IsConfirmed { get; set; }
 
     }
 }
