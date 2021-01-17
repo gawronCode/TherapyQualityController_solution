@@ -23,17 +23,19 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
+        private readonly IUserAnswerRepo _userAnswerRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
-            IAnswerRepo answerRepo)
+            IAnswerRepo answerRepo,
+            IUserAnswerRepo userAnswerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
             _answerRepo = answerRepo;
-
+            _userAnswerRepo = userAnswerRepo;
         }
 
         // GET: PatientQuestionnaireController
@@ -91,11 +93,8 @@ namespace TherapyQualityController.Controllers
 
             for (var i = 0; i < count; i++)
             {
-                
                 string data = form[$"opt{i.ToString()}"];
-
                 if(data is null || data == string.Empty) return RedirectToAction(nameof(ErrorInfo));
-
                 var dataParsed = data.Split(',');
                 answers.Add(new UserAnswer
                 {
@@ -105,10 +104,11 @@ namespace TherapyQualityController.Controllers
                     UserEmail = userEmail
 
                 });
-            
-                
-                
-                
+            }
+
+            foreach (var answer in answers)
+            {
+                _userAnswerRepo.Create(answer).Wait();
             }
 
             return RedirectToAction(nameof(SuccessInfo));

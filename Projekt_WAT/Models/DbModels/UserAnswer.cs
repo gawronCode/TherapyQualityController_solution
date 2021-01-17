@@ -17,5 +17,8 @@ namespace TherapyQualityController.Models.DbModels
         public Question Question { get; set; }
         public string UserEmail { get; set; }
 
+        // public int UserQuestionnaireAnswerId { get; set; }
+        // public UserQuestionnaireAnswer UserQuestionnaireAnswer { get; set; }
+
     }
 }
