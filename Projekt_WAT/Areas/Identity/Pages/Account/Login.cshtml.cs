@@ -44,12 +44,12 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Aby się zalogować musisz podać swój adres email!")]
             [EmailAddress]
             [Display(Name = "Adres email")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Proszę wpisać hasło!")]
             [DataType(DataType.Password)]
             [Display(Name = "Hasło")]
             public string Password { get; set; }

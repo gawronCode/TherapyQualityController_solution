@@ -21,16 +21,19 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
+        private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
 
         public QuestionnaireManagerController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
-            IAnswerRepo answerRepo)
+            IAnswerRepo answerRepo,
+            IPatientQuestionnaireRepo patientQuestionnaireRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
             _answerRepo = answerRepo;
+            _patientQuestionnaireRepo = patientQuestionnaireRepo;
         }
 
         
@@ -124,6 +127,13 @@ namespace TherapyQualityController.Controllers
                 _questionRepo.Delete(question).Wait();
             }
 
+            var patientsQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByQuestionnaireId(id).Result;
+
+            foreach (var patientQuestionnaire in patientsQuestionnaires)
+            {
+                _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+            }
+
             var questionnaire = _questionnaireRepo.GetById(id).Result;
             _questionnaireRepo.Delete(questionnaire).Wait();
             return RedirectToAction(nameof(Index));
@@ -137,14 +147,19 @@ namespace TherapyQualityController.Controllers
                                                         string answer5, int val5)
         {
             
-            if (questionContent == string.Empty || questionContent is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            if (answer1 == string.Empty || answer1 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            if (answer2 == string.Empty || answer2 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            if (answer3 == string.Empty || answer3 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            if (answer4 == string.Empty || answer4 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            if (answer5 == string.Empty || answer5 is null) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if (string.IsNullOrEmpty(questionContent) ||
+                string.IsNullOrEmpty(answer1) ||
+                string.IsNullOrEmpty(answer2) ||
+                string.IsNullOrEmpty(answer3) ||
+                string.IsNullOrEmpty(answer4) ||
+                string.IsNullOrEmpty(answer5)) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            
 
-            if(val1 ==0 || val2 == 0 || val3 == 0 || val4 == 0 || val5 == 0) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+            if(val1 == 0 ||
+               val2 == 0 || 
+               val3 == 0 || 
+               val4 == 0 || 
+               val5 == 0) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
             
             var newQuestion = new Question
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
+using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
 {
@@ -15,15 +17,18 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
+        private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
 
         public DeletePersonalDataModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+            ILogger<DeletePersonalDataModel> logger,
+            IPatientQuestionnaireRepo patientQuestionnaireRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _patientQuestionnaireRepo = patientQuestionnaireRepo;
         }
 
         [BindProperty]
@@ -31,8 +36,9 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Aby usunąć konto musisz podać hasło")]
             [DataType(DataType.Password)]
+            [Display(Name = "Proszę potwierdzić decyzję wpisaniem hasła")]
             public string Password { get; set; }
         }
 
@@ -68,7 +74,17 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            var patientQuestionnaires =
+                _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(User.FindFirstValue(ClaimTypes.Email)).Result;
+
+            foreach (var patientQuestionnaire in patientQuestionnaires)
+            {
+                _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+            }
+
             var result = await _userManager.DeleteAsync(user);
+
+
             var userId = await _userManager.GetUserIdAsync(user);
             if (!result.Succeeded)
             {

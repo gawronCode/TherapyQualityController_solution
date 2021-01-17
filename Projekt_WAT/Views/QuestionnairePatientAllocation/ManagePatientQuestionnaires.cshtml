@@ -17,55 +17,71 @@
 
     @if (Model.PatientQuestionnaires.Count > 0)
     {
-        <form asp-action="RemoveQuestionnaireFromPatient" method="post">
-            @foreach (var item in Model.PatientQuestionnaires)
-            {
+
+        @foreach (var item in Model.PatientQuestionnaires)
+        {
+            <form asp-action="RemoveQuestionnaireFromPatient" method="post">
                 <div class="row">
                     <div class="media">
                         <div class="media-body">
                             <h4 class="mt-0">@item.QuestionnaireName</h4>
-                            <input class="form-control" name=@($"") value="@item.QuestionnaireId" style="display: none">
-                            <input class="form-control" name="questionnaireId" value="@item.PatientEmail" style="display: none">
+                            <input class="form-control" name="id" value=@item.QuestionnaireId style="display: none">
+                            <input class="form-control" name="email" value="@Model.patientEmail" style="display: none">
                             <small><button class="btn btn-danger btn-sm" role="button" style="margin-top: 10px">Zabierz ankietę</button></small>
                         </div>
                     </div>
                 </div>
                 <hr class=" row">
-            }
-        </form>
+            </form>
+        }
+
+    }
+    else
+    {
+    <div class="row">
+        <div class="media">
+            <div class="media-body">
+                <h4 class="mt-0">Brak ankiet przydzielonych pacjentowi</h4>
+            </div>
+        </div>
+    </div>
+    }
+
+    <div class="row" style="margin-bottom: 30px; margin-top: 80px">
+        <h3>Dostępne ankiety:</h3>
+    </div>
+
+    @if (Model.Questionnaires.Count > 0)
+    {
+        @foreach (var item in Model.Questionnaires)
+        {
+            <form asp-action="AssignQuestionnaireToPatient" method="post">
+                <div class="row">
+                    <div class="media">
+                        <div class="media-body">
+                            <h4 class="mt-0">@item.Name</h4>
+                            <input class="form-control" name="id" value=@item.Id style="display: none">
+                            <input class="form-control" name="email" value="@Model.patientEmail" style="display: none">
+                            <small><button class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Przydziel ankietę</button></small>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+            </form>
+        }
     }
     else
     {
         <div class="row">
             <div class="media">
                 <div class="media-body">
-                    <h4 class="mt-0">Brak ankiet przydzielonych pacjentowi</h4>
+                    <h4 class="mt-0">Brak ankiet dostępnych do przydzielenia</h4>
                 </div>
             </div>
         </div>
     }
 
-    <div class="row" style="margin-bottom: 30px; margin-top: 80px">
-        <h3>Dostępne ankiety:</h3>
-    </div>
-    
-    <form asp-action="AsignQuestionnaireToPatient" method="post">
-        @foreach (var item in Model.Questionnaires)
-        {
-            <div class="row">
-                <div class="media">
-                    <div class="media-body">
-                        <h4 class="mt-0">@item.Name</h4>
-                        <input class="form-control" name="questionnaireId" value="@item.Id" style="display: none">
-                        <small><button class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Przydziel ankietę</button></small>
-                    </div>
-                </div>
-            </div>
-            <hr>
-        }
-    </form>
-
     <div class="row">
-    <a asp-action="Index" class="btn btn-dark" style="margin-top: 30px; width: 200px">Powrót</a>
+        <a asp-action="Index" class="btn btn-dark" style="margin-top: 30px; width: 200px">Powrót</a>
     </div>
 </div>

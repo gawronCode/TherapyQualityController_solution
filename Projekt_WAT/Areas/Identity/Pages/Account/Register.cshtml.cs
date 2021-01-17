@@ -48,13 +48,12 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
+            [Required(ErrorMessage = "Podanie adresu email jest wymagane")]
+            [EmailAddress(ErrorMessage = "Niepoprawny format adresu email")]
             [Display(Name = "Adres email")]
             public string Email { get; set; }
-
-            [Required]
-            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Utworzenie hasła jest wymagane")]
+            [StringLength(100, ErrorMessage = "Hasło musi mieć minimum 6 znaków!", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Hasło")]
             public string Password { get; set; }
@@ -62,15 +61,15 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account
             [Display(Name = "Potwierdź hasło")]
             [Compare("Password", ErrorMessage = "hasło i potwierdzenie hasła róznią się!")]
             public string ConfirmPassword { get; set; }
-            [Required]
+            [Required(ErrorMessage = "Podanie imienia jest wymagane")]
             [DataType(DataType.Text)]
             [Display(Name = "Imię")]
             public string FirstName { get; set; }
-            [Required]
+            [Required(ErrorMessage = "Podanie nazwiska jest wymagane")]
             [DataType(DataType.Text)]
             [Display(Name = "Nazwisko")]
             public string LastName { get; set; }
-            [Required]
+            [Required(ErrorMessage = "Podanie numeru PESEL jest wymagane")]
             [DataType(DataType.Text)]
             [Display(Name = "PESEL")]
             public string PESEL { get; set; }

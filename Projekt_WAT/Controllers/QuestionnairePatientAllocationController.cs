@@ -5,11 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Models.ViewModels;
 using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Controllers
 {
+    [Authorize(Roles = "Administrator,Doctor")]
     public class QuestionnairePatientAllocationController : Controller
     {
 
@@ -67,6 +70,25 @@ namespace TherapyQualityController.Controllers
             };
 
             return View(model);
+        }
+
+        public ActionResult AssignQuestionnaireToPatient(int id, string email)
+        {
+            _patientQuestionnaireRepo.Create(new UserQuestionnaire
+            {
+                PatientEmail = email,
+                QuestionnaireId = id
+            }).Wait();
+
+            return RedirectToAction("ManagePatientQuestionnaires", new { id = email });
+        }
+
+        public ActionResult RemoveQuestionnaireFromPatient(int id, string email)
+        {
+            var patientQuestionnaire = _patientQuestionnaireRepo.GetByIdAndUserEmail(id, email).Result;
+            _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+
+            return RedirectToAction("ManagePatientQuestionnaires", new { id = email });
         }
 
         // GET: QuestionnairePatientAllocationController/Details/5

@@ -46,11 +46,25 @@ namespace TherapyQualityController.Repositories.Repos
             throw new NotImplementedException();
         }
 
+        public async Task<UserQuestionnaire> GetByIdAndUserEmail(int id, string email)
+        {
+            var userQuestionnaire =
+                await _context.UserQuestionnaires.FirstOrDefaultAsync(q =>
+                    q.QuestionnaireId == id && q.PatientEmail == email);
+            return userQuestionnaire;
+        }
+
         public async Task<ICollection<UserQuestionnaire>> GetPatientQuestionnairesByEmail(string email)
         {
             var patientQuestionnaires = await _context.UserQuestionnaires.Where(q => q.PatientEmail == email).ToListAsync();
             return patientQuestionnaires;
 
+        }
+
+        public async Task<ICollection<UserQuestionnaire>> GetPatientQuestionnairesByQuestionnaireId(int id)
+        {
+            var patientsQuestionnaires = await _context.UserQuestionnaires.Where(q => q.QuestionnaireId == id).ToListAsync();
+            return patientsQuestionnaires;
         }
 
         public async Task<bool> Save()
