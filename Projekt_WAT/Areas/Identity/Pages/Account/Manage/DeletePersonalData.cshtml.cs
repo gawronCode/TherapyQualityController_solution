@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -18,17 +19,23 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
+        private readonly IUserAnswerRepo _userAnswerRepo;
+        private readonly IUserQuestionnaireAnswerRepo _userQuestionnaireAnswerRepo;
 
         public DeletePersonalDataModel(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             ILogger<DeletePersonalDataModel> logger,
-            IPatientQuestionnaireRepo patientQuestionnaireRepo)
+            IPatientQuestionnaireRepo patientQuestionnaireRepo,
+            IUserAnswerRepo userAnswerRepo,
+            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
+            _userAnswerRepo = userAnswerRepo;
+            _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
         }
 
         [BindProperty]
@@ -80,6 +87,20 @@ namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
             foreach (var patientQuestionnaire in patientQuestionnaires)
             {
                 _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+            }
+
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(userEmail).Result;
+            var questionnaireAnswered = _userQuestionnaireAnswerRepo.GetByUserEmail(userEmail).Result;
+
+            foreach (var userAnswer in userAnswers)
+            {
+                _userAnswerRepo.Delete(userAnswer).Wait();
+            }
+
+            foreach (var questionnaire in questionnaireAnswered)
+            {
+                _userQuestionnaireAnswerRepo.Delete(questionnaire).Wait();
             }
 
             var result = await _userManager.DeleteAsync(user);

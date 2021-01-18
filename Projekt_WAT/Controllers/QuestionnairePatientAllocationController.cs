@@ -23,13 +23,17 @@ namespace TherapyQualityController.Controllers
         private readonly IAnswerRepo _answerRepo;
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
         private readonly UserManager<User> _userManager;
+        private readonly IUserAnswerRepo _userAnswerRepo;
+        private readonly IUserQuestionnaireAnswerRepo _userQuestionnaireAnswerRepo;
 
         public QuestionnairePatientAllocationController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
             IAnswerRepo answerRepo,
             IPatientQuestionnaireRepo patientQuestionnaireRepo,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            IUserAnswerRepo userAnswerRepo,
+            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
@@ -37,6 +41,8 @@ namespace TherapyQualityController.Controllers
             _answerRepo = answerRepo;
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
             _userManager = userManager;
+            _userAnswerRepo = userAnswerRepo;
+            _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
         }
 
 
@@ -105,6 +111,21 @@ namespace TherapyQualityController.Controllers
             var patientQuestionnaire = _patientQuestionnaireRepo.GetByIdAndUserEmail(id, email).Result;
             _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
 
+            var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(email).Result;
+            var answersToSelectedQuestionnaire = userAnswers.Where(answer =>
+                _questionRepo.GetById(answer.QuestionId).Result.QuestionnaireId == id).ToList();
+            var questionnaireAnswered = _userQuestionnaireAnswerRepo.GetByUserEmailAndQuestionnaireId(email, id).Result;
+
+            foreach (var userAnswer in answersToSelectedQuestionnaire)
+            {
+                _userAnswerRepo.Delete(userAnswer).Wait();
+            }
+
+            foreach (var questionnaire in questionnaireAnswered)
+            {
+                _userQuestionnaireAnswerRepo.Delete(questionnaire);
+            }
+            
             return RedirectToAction("ManagePatientQuestionnaires", new { id = email });
         }
 

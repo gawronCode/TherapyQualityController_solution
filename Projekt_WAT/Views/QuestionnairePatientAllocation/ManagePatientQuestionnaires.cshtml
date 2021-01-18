@@ -4,7 +4,7 @@
 @model TherapyQualityController.Models.ViewModels.PatientQuestionnaireManagerViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Aktywne badania";
 }
 
 <div class="container">
@@ -27,7 +27,7 @@
                             <h4 class="mt-0">@item.QuestionnaireName</h4>
                             <input class="form-control" name="id" value=@item.QuestionnaireId style="display: none">
                             <input class="form-control" name="email" value="@Model.patientEmail" style="display: none">
-                            <small><button class="btn btn-danger btn-sm" role="button" style="margin-top: 10px">Zabierz ankietę</button></small>
+                            <small><button class="btn btn-danger btn-sm" role="button" style="margin-top: 10px">Zakończ badanie</button></small>
                         </div>
                     </div>
                 </div>
@@ -62,7 +62,7 @@
                             <h4 class="mt-0">@item.Name</h4>
                             <input class="form-control" name="id" value=@item.Id style="display: none">
                             <input class="form-control" name="email" value="@Model.patientEmail" style="display: none">
-                            <small><button class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Przydziel ankietę</button></small>
+                            <small><button class="btn btn-secondary btn-sm" role="button" style="margin-top: 10px">Rozpocznij badanie</button></small>
                         </div>
                     </div>
                 </div>

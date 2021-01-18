@@ -24,18 +24,21 @@ namespace TherapyQualityController.Controllers
         private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
         private readonly IUserAnswerRepo _userAnswerRepo;
+        private readonly IUserQuestionnaireAnswerRepo _userQuestionnaireAnswerRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
             IAnswerRepo answerRepo,
-            IUserAnswerRepo userAnswerRepo)
+            IUserAnswerRepo userAnswerRepo,
+            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
             _answerRepo = answerRepo;
             _userAnswerRepo = userAnswerRepo;
+            _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
         }
 
         // GET: PatientQuestionnaireController
@@ -94,17 +97,30 @@ namespace TherapyQualityController.Controllers
             for (var i = 0; i < count; i++)
             {
                 string data = form[$"opt{i.ToString()}"];
-                if(data is null || data == string.Empty) return RedirectToAction(nameof(ErrorInfo));
+                if(string.IsNullOrEmpty(data)) return RedirectToAction(nameof(ErrorInfo));
                 var dataParsed = data.Split(',');
                 answers.Add(new UserAnswer
                 {
-                    AnswerDate = DateTime.Now,
                     QuestionId = Convert.ToInt32(dataParsed[0]),
                     Value = Convert.ToInt32(dataParsed[1]),
                     UserEmail = userEmail
-
                 });
             }
+
+            var userQuestionnaireAnswer = new UserQuestionnaireAnswer
+            {
+                AnswerDate = DateTime.Now,
+                QuestionnaireId = _questionRepo.GetById(answers[0].QuestionId).Result.QuestionnaireId,
+                UserEmail = answers[0].UserEmail
+            };
+
+            _userQuestionnaireAnswerRepo.Create(userQuestionnaireAnswer).Wait();
+
+            foreach (var answer in answers)
+            {
+                answer.UserQuestionnaireAnswerId = userQuestionnaireAnswer.Id;
+            }
+
 
             foreach (var answer in answers)
             {

@@ -134,6 +134,8 @@ namespace TherapyQualityController.Controllers
                 _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
             }
 
+
+
             var questionnaire = _questionnaireRepo.GetById(id).Result;
             _questionnaireRepo.Delete(questionnaire).Wait();
             return RedirectToAction(nameof(Index));

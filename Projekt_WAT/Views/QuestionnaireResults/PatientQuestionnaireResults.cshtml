@@ -1,5 +1,140 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model TherapyQualityController.Models.ViewModels.ResultViewModel
+
 @{
+
+    double[] data = Model.AverageQuestionnaireScore;
+
 }
+
+@{
+    ViewData["Title"] = "Wyniki - Szczegóły";
+}
+
+@if (Model.NumberOfSolvedQuestionnaires > 0)
+{
+
+<div class="container">
+    <div class="row">
+        <h1>Podsumowanie wyników ankiety "@Model.QuestionnaireName" </h1>
+    </div>
+    <div class="row" style="margin-top: 40px">
+        <h3>Dane pacjenta:</h3>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <h5>Imię: @Model.FirstName</h5>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <h5>Nazwisko: @Model.LastName</h5>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <h5>PESEL: @Model.PESEL</h5>
+    </div>
+    <div class="row" style="margin-top: 20px">
+        <h3>Szczegóły badania:</h3>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <h5>Data rozpoczecia badania: @Model.StudyStart.Value.ToShortDateString()</h5>
+    </div>
+    <div class="row" style="margin-top: 10px">
+        <h5>Liczba wypełnionych przez pacjenta ankiet: @Model.NumberOfSolvedQuestionnaires</h5>
+    </div>
+    <div class="row" style="margin-top: 10px; margin-bottom: 60px">
+        <h5>Ostatniej odpowiedzi udzielono: @Model.LastQuestionnaireDate.Value.ToShortDateString()</h5>
+    </div>
+</div>
+
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+
+
+    <figure class="highcharts-figure">
+        <div id="container"></div>
+    </figure>
+
+    <script>
+
+        var dataJS = @Html.Raw(Json.Serialize(data));
+
+        Highcharts.chart('container',
+            {
+                title: {
+                    text: 'Podsumowanie graficzne badania'
+                },
+
+                subtitle: {
+                    text: ''
+                },
+
+                yAxis: {
+                    title: {
+                        text: 'Średni wynik z ankiety'
+                    }
+                },
+
+                xAxis: {
+                    title: {
+                        text: 'Numer przesłanej ankiety'
+                    },
+                    accessibility: {
+                        rangeDescription: 'Numer przesłanej ankiety'
+                    }
+                },
+
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle'
+                },
+
+                plotOptions: {
+                    series: {
+                        label: {
+                            connectorAllowed: false
+                        },
+                        pointStart: 1
+                    }
+                },
+
+                series: [
+                    {
+                        name: 'Średni wynik z ankiety',
+                        data: dataJS
+                    }
+                ],
+
+                responsive: {
+                    rules: [
+                        {
+                            condition: {
+                                maxWidth: 1200
+                            },
+                            chartOptions: {
+                                legend: {
+                                    layout: 'horizontal',
+                                    align: 'right',
+                                    verticalAlign: 'middle'
+                                }
+                            }
+                        }
+                    ]
+                },
+
+                credits: {
+                    enabled: false
+                }
+
+            });
+
+    </script>
+
+
+}
+else
+{
+    <h1>Pacjent nie udzielił jeszcze żadnej odpowiedzi na tą ankietę</h1>
+}
+
+
+
+<div class="row">
+    <a asp-action="PatientQuestionnaires" asp-route-id="@Model.PatientEmail" class="btn btn-dark" style="margin-top: 40px; width: 200px">Powrót</a>
+</div>

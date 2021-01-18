@@ -11,5 +11,6 @@ namespace TherapyQualityController.Models.DbModels
         public string UserEmail { get; set; }
         public int QuestionnaireId { get; set; }
         public Questionnaire Questionnaire { get; set; }
+        public DateTime? AnswerDate { get; set; }
     }
 }

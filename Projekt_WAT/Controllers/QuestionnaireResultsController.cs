@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Humanizer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using TherapyQualityController.Models.DbModels;
+using TherapyQualityController.Models.TmpModels;
 using TherapyQualityController.Models.ViewModels;
 using TherapyQualityController.Repositories.IRepos;
 
@@ -24,6 +22,7 @@ namespace TherapyQualityController.Controllers
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
         private readonly UserManager<User> _userManager;
         private readonly IUserAnswerRepo _userAnswerRepo;
+        private readonly IUserQuestionnaireAnswerRepo _userQuestionnaireAnswerRepo;
 
         public QuestionnaireResultsController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
@@ -31,7 +30,8 @@ namespace TherapyQualityController.Controllers
             IAnswerRepo answerRepo,
             IPatientQuestionnaireRepo patientQuestionnaireRepo,
             UserManager<User> userManager,
-            IUserAnswerRepo userAnswerRepo)
+            IUserAnswerRepo userAnswerRepo,
+            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
@@ -40,6 +40,7 @@ namespace TherapyQualityController.Controllers
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
             _userManager = userManager;
             _userAnswerRepo = userAnswerRepo;
+            _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
         }
 
         // GET: QuestionnaireResultsController
@@ -47,14 +48,14 @@ namespace TherapyQualityController.Controllers
         {
             var patients = _userRepo.GetAll().Result;
             var model = (from patient in patients
-                where _userManager.IsInRoleAsync(patient, "Patient").Result
-                select new PatientViewModel
-                {
-                    EmailAddress = patient.Email,
-                    FirstName = patient.FirstName,
-                    LastName = patient.LastName,
-                    PESEL = patient.PESEL
-                }).ToList();
+                         where _userManager.IsInRoleAsync(patient, "Patient").Result
+                         select new PatientViewModel
+                         {
+                             EmailAddress = patient.Email,
+                             FirstName = patient.FirstName,
+                             LastName = patient.LastName,
+                             PESEL = patient.PESEL
+                         }).ToList();
 
             return View(model);
         }
@@ -62,12 +63,6 @@ namespace TherapyQualityController.Controllers
 
         public ActionResult PatientQuestionnaires(string id)
         {
-            // var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(id).Result;
-            // var questions = userAnswers.Select(answer => _questionRepo.GetById(answer.QuestionId).Result).ToList();
-            // questions = questions.Distinct().ToList();
-            // var questionnaires = questions.Select(question => _questionnaireRepo.GetById(question.QuestionnaireId).Result).ToList();
-            // questionnaires = questionnaires.Distinct().ToList();
-
             var patientQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id).Result;
             var patientQuestionnaireViewModels = patientQuestionnaires.Select(patientQuestionnaire =>
                 new PatientQuestionnaireViewModel
@@ -90,19 +85,56 @@ namespace TherapyQualityController.Controllers
         {
             var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(email).Result;
             
-            // var questions = userAnswers.Select(answer => _questionRepo.GetById(answer.QuestionId).Result).ToList();
-            // questions = questions.Distinct().ToList();
-            //
-            // var questionnaires = questions.Select(question => _questionnaireRepo.GetById(question.QuestionnaireId).Result).ToList();
-            // questionnaires = questionnaires.Distinct().ToList();
-
-            var answersToSelectedQuestionnaire = userAnswers.Where(answer => 
+            var answersToSelectedQuestionnaire = userAnswers.Where(answer =>
                 _questionRepo.GetById(answer.QuestionId).Result.QuestionnaireId == id).ToList();
 
+            var user = _userManager.FindByEmailAsync(email).Result;
+
+            var model = new ResultViewModel
+            {
+                NumberOfSolvedQuestionnaires = 0,
+                PatientEmail = email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PESEL = user.PESEL
+            };
+
+            if (answersToSelectedQuestionnaire.Count==0) return View(model);
+
+            var questionnaireAnswered = _userQuestionnaireAnswerRepo.GetByUserEmailAndQuestionnaireId(email, id).Result;
 
 
-            return RedirectToAction(nameof(Index));
-            // return View();
+            var questionnaireAnswerDetails = new List<QuestionnaireAnswerDetails>();
+
+            foreach (var questionnaireAnswer in questionnaireAnswered)
+            {
+                var questionnaireDetails = new QuestionnaireAnswerDetails
+                {
+                    AnswerDate = questionnaireAnswer.AnswerDate,
+                    AnswerCount = 0,
+                    AnswerSum = 0
+                };
+                foreach (var answer in answersToSelectedQuestionnaire.Where(answer => answer.UserQuestionnaireAnswerId == questionnaireAnswer.Id))
+                {
+                    questionnaireDetails.AnswerCount++;
+                    questionnaireDetails.AnswerSum += answer.Value;
+                }
+                questionnaireAnswerDetails.Add(questionnaireDetails);
+            }
+
+            questionnaireAnswerDetails = questionnaireAnswerDetails.Where(q => 
+                q.AnswerDate.HasValue).OrderBy(q => 
+                q.AnswerDate.Value).ToList();
+
+            var averageScorePerQuestionnaire = questionnaireAnswerDetails.Select(answerDetail => answerDetail.GetAverageScore()).ToList();
+
+            model.AverageQuestionnaireScore = averageScorePerQuestionnaire.ToArray();
+            model.LastQuestionnaireDate = questionnaireAnswerDetails.LastOrDefault().AnswerDate;
+            model.NumberOfSolvedQuestionnaires = questionnaireAnswerDetails.Count;
+            model.QuestionnaireName = _questionnaireRepo.GetById(id).Result.Name;
+            model.StudyStart = questionnaireAnswerDetails.FirstOrDefault().AnswerDate;
+
+            return View(model);
         }
 
 

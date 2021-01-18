@@ -203,7 +203,28 @@ namespace TherapyQualityController.Migrations
                         column: x => x.QuestionnaireId,
                         principalTable: "Questionnaires",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserQuestionnaireAnswers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QuestionnaireId = table.Column<int>(type: "int", nullable: false),
+                    AnswerDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserQuestionnaireAnswers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserQuestionnaireAnswers_Questionnaires_QuestionnaireId",
+                        column: x => x.QuestionnaireId,
+                        principalTable: "Questionnaires",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -224,7 +245,7 @@ namespace TherapyQualityController.Migrations
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -234,9 +255,9 @@ namespace TherapyQualityController.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<int>(type: "int", nullable: false),
-                    AnswerDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false),
-                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserEmail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserQuestionnaireAnswerId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -246,7 +267,13 @@ namespace TherapyQualityController.Migrations
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserAnswers_UserQuestionnaireAnswers_UserQuestionnaireAnswerId",
+                        column: x => x.UserQuestionnaireAnswerId,
+                        principalTable: "UserQuestionnaireAnswers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -302,6 +329,16 @@ namespace TherapyQualityController.Migrations
                 name: "IX_UserAnswers_QuestionId",
                 table: "UserAnswers",
                 column: "QuestionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserAnswers_UserQuestionnaireAnswerId",
+                table: "UserAnswers",
+                column: "UserQuestionnaireAnswerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserQuestionnaireAnswers_QuestionnaireId",
+                table: "UserQuestionnaireAnswers",
+                column: "QuestionnaireId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -338,6 +375,9 @@ namespace TherapyQualityController.Migrations
 
             migrationBuilder.DropTable(
                 name: "Questions");
+
+            migrationBuilder.DropTable(
+                name: "UserQuestionnaireAnswers");
 
             migrationBuilder.DropTable(
                 name: "Questionnaires");
