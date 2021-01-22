@@ -78,7 +78,7 @@ namespace TherapyQualityController.Controllers
 
             var model = new PatientQuestionnaireManagerViewModel
             {
-                patientEmail = id,
+                PatientEmail = id,
                 PatientQuestionnaires = patientQuestionnaireViewModels,
                 Questionnaires = questionnaireViewModels
             };

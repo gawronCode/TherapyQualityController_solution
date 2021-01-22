@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace TherapyQualityController.Models.DbModels
+﻿namespace TherapyQualityController.Models.DbModels
 {
     public class Answer
     {
