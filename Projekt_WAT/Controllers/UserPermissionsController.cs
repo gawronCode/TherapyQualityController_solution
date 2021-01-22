@@ -32,8 +32,7 @@ namespace TherapyQualityController.Controllers
             foreach (var patient in patients)
             {
                 if (string.IsNullOrEmpty(patient.PWZ)) continue;
-                if (await _userManager.IsInRoleAsync(patient, "Doctor"))
-                {
+                
                     model.Add(new DoctorViewModel
                     {
                         EmailAddress = patient.Email,
@@ -41,21 +40,8 @@ namespace TherapyQualityController.Controllers
                         LastName = patient.LastName,
                         PESEL = patient.PESEL,
                         PWZ = patient.PWZ,
-                        IsConfirmed = true
+                        IsConfirmed = (await _userManager.IsInRoleAsync(patient, "Doctor"))
                     });
-                }
-                else
-                {
-                    model.Add(new DoctorViewModel
-                    {
-                        EmailAddress = patient.Email,
-                        FirstName = patient.FirstName,
-                        LastName = patient.LastName,
-                        PESEL = patient.PESEL,
-                        PWZ = patient.PWZ,
-                        IsConfirmed = false
-                    });
-                }
             }
 
             return View(model);
