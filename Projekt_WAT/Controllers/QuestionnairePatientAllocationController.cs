@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +16,6 @@ namespace TherapyQualityController.Controllers
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
-        private readonly IAnswerRepo _answerRepo;
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
         private readonly UserManager<User> _userManager;
         private readonly IUserAnswerRepo _userAnswerRepo;
@@ -29,7 +24,6 @@ namespace TherapyQualityController.Controllers
         public QuestionnairePatientAllocationController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
-            IAnswerRepo answerRepo,
             IPatientQuestionnaireRepo patientQuestionnaireRepo,
             UserManager<User> userManager,
             IUserAnswerRepo userAnswerRepo,
@@ -38,7 +32,6 @@ namespace TherapyQualityController.Controllers
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
-            _answerRepo = answerRepo;
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
             _userManager = userManager;
             _userAnswerRepo = userAnswerRepo;
@@ -46,13 +39,11 @@ namespace TherapyQualityController.Controllers
         }
 
 
-
-        // GET: QuestionnairePatientAllocationController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            var patients = _userRepo.GetAll().Result;
+            var patients = await _userRepo.GetAll();
             var model = (from patient in patients 
-                where _userManager.IsInRoleAsync(patient, "Patient").Result 
+                where  _userManager.IsInRoleAsync(patient, "Patient").Result 
                 select new PatientViewModel {EmailAddress = patient.Email, 
                     FirstName = patient.FirstName, 
                     LastName = patient.LastName, 
@@ -61,15 +52,15 @@ namespace TherapyQualityController.Controllers
             return View(model);
         }
 
-        public ActionResult ManagePatientQuestionnaires(string id)
+        public async Task<ActionResult> ManagePatientQuestionnaires(string id)
         {
 
-            var patientQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id).Result;
+            var patientQuestionnaires = await _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id);
             var patientQuestionnaireViewModels = patientQuestionnaires.Select(patientQuestionnaire => 
                 new PatientQuestionnaireViewModel {PatientEmail = patientQuestionnaire.PatientEmail, 
                     QuestionnaireId = patientQuestionnaire.QuestionnaireId}).ToList();
 
-            var questionnaires = _questionnaireRepo.GetAll().Result;
+            var questionnaires = await _questionnaireRepo.GetAll();
             var questionnaireViewModels = questionnaires.Select(questionnaire => 
                 new QuestionnaireViewModel { Fields = null, 
                     Id = questionnaire.Id, 
@@ -95,107 +86,39 @@ namespace TherapyQualityController.Controllers
             return View(model);
         }
 
-        public ActionResult AssignQuestionnaireToPatient(int id, string email)
+        public async Task<ActionResult> AssignQuestionnaireToPatient(int id, string email)
         {
-            _patientQuestionnaireRepo.Create(new UserQuestionnaire
+            await _patientQuestionnaireRepo.Create(new UserQuestionnaire
             {
                 PatientEmail = email,
                 QuestionnaireId = id
-            }).Wait();
+            });
 
             return RedirectToAction("ManagePatientQuestionnaires", new { id = email });
         }
 
-        public ActionResult RemoveQuestionnaireFromPatient(int id, string email)
+        public async Task<ActionResult> RemoveQuestionnaireFromPatient(int id, string email)
         {
-            var patientQuestionnaire = _patientQuestionnaireRepo.GetByIdAndUserEmail(id, email).Result;
-            _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+            var patientQuestionnaire = await _patientQuestionnaireRepo.GetByIdAndUserEmail(id, email);
+            await _patientQuestionnaireRepo.Delete(patientQuestionnaire);
 
-            var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(email).Result;
+            var userAnswers = await _userAnswerRepo.GetUserAnswersByUserEmail(email);
             var answersToSelectedQuestionnaire = userAnswers.Where(answer =>
                 _questionRepo.GetById(answer.QuestionId).Result.QuestionnaireId == id).ToList();
             var questionnaireAnswered = _userQuestionnaireAnswerRepo.GetByUserEmailAndQuestionnaireId(email, id).Result;
 
             foreach (var userAnswer in answersToSelectedQuestionnaire)
             {
-                _userAnswerRepo.Delete(userAnswer).Wait();
+                await _userAnswerRepo.Delete(userAnswer);
             }
 
             foreach (var questionnaire in questionnaireAnswered)
             {
-                _userQuestionnaireAnswerRepo.Delete(questionnaire);
+                await _userQuestionnaireAnswerRepo.Delete(questionnaire);
             }
             
             return RedirectToAction("ManagePatientQuestionnaires", new { id = email });
         }
 
-        // GET: QuestionnairePatientAllocationController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: QuestionnairePatientAllocationController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: QuestionnairePatientAllocationController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: QuestionnairePatientAllocationController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnairePatientAllocationController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: QuestionnairePatientAllocationController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnairePatientAllocationController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
