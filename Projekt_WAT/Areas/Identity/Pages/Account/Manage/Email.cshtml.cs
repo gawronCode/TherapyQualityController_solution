@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
 {
+    [Authorize(Roles = "Administrator")]
     public partial class EmailModel : PageModel
     {
         private readonly UserManager<User> _userManager;

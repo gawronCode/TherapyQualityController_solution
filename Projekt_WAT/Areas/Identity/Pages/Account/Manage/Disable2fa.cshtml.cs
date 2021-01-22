@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
 {
+    [Authorize(Roles = "Administrator")]
     public class Disable2faModel : PageModel
     {
         private readonly UserManager<User> _userManager;
