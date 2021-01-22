@@ -1,14 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Models.ViewModels;
-using TherapyQualityController.Repositories;
 using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Controllers
@@ -19,47 +16,35 @@ namespace TherapyQualityController.Controllers
 
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
-        private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
 
         public QuestionnaireManagerController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            IUserRepo userRepo,
             IAnswerRepo answerRepo,
             IPatientQuestionnaireRepo patientQuestionnaireRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
-            _userRepo = userRepo;
             _answerRepo = answerRepo;
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
         }
 
         
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            var questionnaires = _questionnaireRepo.GetAll().Result;
-            var model = new List<QuestionnaireViewModel>();
-
-            foreach (var questionnaire in questionnaires)
-            {
-                model.Add(new QuestionnaireViewModel
-                {
-                    Fields = null,
-                    Id=questionnaire.Id,
-                    Name = questionnaire.Name
-                });
-            }
+            var questionnaires = await _questionnaireRepo.GetAll();
+            var model = questionnaires.Select(questionnaire => new QuestionnaireViewModel {Fields = null, Id = questionnaire.Id, Name = questionnaire.Name}).ToList();
 
             return View(model);
         }
 
-        public ActionResult ManageQuestions(int id)
+
+        public async Task<ActionResult> ManageQuestions(int id)
         {
             
-            var questionnaire = _questionnaireRepo.GetById(id).Result;
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+            var questionnaire = await _questionnaireRepo.GetById(id);
+            var questions = await _questionRepo.GetQuestionsByQuestionnaireId(id);
 
             var model = new QuestionnaireViewModel
             {
@@ -67,10 +52,11 @@ namespace TherapyQualityController.Controllers
                 Name = questionnaire.Name,
                 Fields = new List<FieldViewModel>()
             };
+
             var i = 0;
             foreach (var question in questions)
             {
-                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                var answers = await _answerRepo.GetAnswersByQuestionId(question.Id);
                 var answerViewModels = answers.Select(answer => new AnswerViewModel {Content = answer.Content, Value = answer.Value}).ToList();
 
                 model.Fields.Add(new FieldViewModel
@@ -87,7 +73,7 @@ namespace TherapyQualityController.Controllers
         }
         
         
-        public ActionResult CreateQuestionnaire(string questionnaireName)
+        public async Task<ActionResult> CreateQuestionnaire(string questionnaireName)
         {
 
             if (questionnaireName == string.Empty || questionnaireName is null) return RedirectToAction(nameof(Index));
@@ -98,50 +84,40 @@ namespace TherapyQualityController.Controllers
                 Name = questionnaireName
             };
 
-            _questionnaireRepo.Create(newQuestionnaire).Wait();
+            await _questionnaireRepo.Create(newQuestionnaire);
             return RedirectToAction(nameof(Index));
         }
 
-        //Todo dokończyć to xD Zmiana nazwy ankiety
-        // public ActionResult RenameQuestionnaire(int id, string newName)
-        // {
-        //     var questionnaire = _questionnaireRepo.GetById(id).Result;
-        //     questionnaire.Name = newName;
-        //     _questionnaireRepo.Update(questionnaire).Wait();
-        //     return RedirectToAction(nameof(Index));
-        // }
 
-        public ActionResult RemoveQuestionnaire(int id)
+        public async Task<ActionResult> RemoveQuestionnaire(int id)
         {
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+            var questions = await _questionRepo.GetQuestionsByQuestionnaireId(id);
             
-
             foreach (var question in questions)
             {
-                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                var answers = await _answerRepo.GetAnswersByQuestionId(question.Id);
                 foreach (var answer in answers)
                 {
-                    _answerRepo.Delete(answer).Wait();
+                    await _answerRepo.Delete(answer);
                 }
 
-                _questionRepo.Delete(question).Wait();
+                await _questionRepo.Delete(question);
             }
 
             var patientsQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByQuestionnaireId(id).Result;
 
             foreach (var patientQuestionnaire in patientsQuestionnaires)
             {
-                _patientQuestionnaireRepo.Delete(patientQuestionnaire).Wait();
+                await _patientQuestionnaireRepo.Delete(patientQuestionnaire);
             }
 
-
-
-            var questionnaire = _questionnaireRepo.GetById(id).Result;
-            _questionnaireRepo.Delete(questionnaire).Wait();
+            var questionnaire = await _questionnaireRepo.GetById(id); 
+            await _questionnaireRepo.Delete(questionnaire);
             return RedirectToAction(nameof(Index));
         }
 
-        public ActionResult AddQuestionToQuestionnaire(string questionContent, int questionnaireId,
+
+        public async Task<ActionResult> AddQuestionToQuestionnaire(string questionContent, int questionnaireId,
                                                         string answer1, int val1,
                                                         string answer2, int val2,
                                                         string answer3, int val3,
@@ -150,18 +126,11 @@ namespace TherapyQualityController.Controllers
         {
             
             if (string.IsNullOrEmpty(questionContent) ||
-                string.IsNullOrEmpty(answer1) ||
-                string.IsNullOrEmpty(answer2) ||
-                string.IsNullOrEmpty(answer3) ||
-                string.IsNullOrEmpty(answer4) ||
-                string.IsNullOrEmpty(answer5)) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
-            
-
-            if(val1 == 0 ||
-               val2 == 0 || 
-               val3 == 0 || 
-               val4 == 0 || 
-               val5 == 0) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
+                string.IsNullOrEmpty(answer1) || val1 == 0 ||
+                string.IsNullOrEmpty(answer2) || val2 == 0 ||
+                string.IsNullOrEmpty(answer3) || val3 == 0 ||
+                string.IsNullOrEmpty(answer4) || val4 == 0 ||
+                string.IsNullOrEmpty(answer5) || val5 == 0) return RedirectToAction("ErrorInfo", new { id = questionnaireId });
             
             var newQuestion = new Question
             {
@@ -169,101 +138,61 @@ namespace TherapyQualityController.Controllers
                 QuestionnaireId = questionnaireId
             };
             
-            _questionRepo.Create(newQuestion).Wait();
+            await _questionRepo.Create(newQuestion);
 
-            _answerRepo.Create(new Answer
+            await _answerRepo.Create(new Answer
             {
                 Content = answer1,
                 Value = val1,
                 QuestionId = newQuestion.Id
-            }).Wait();
-            _answerRepo.Create(new Answer
+            });
+            await _answerRepo.Create(new Answer
             {
                 Content = answer2,
                 Value = val2,
                 QuestionId = newQuestion.Id
-            }).Wait();
-            _answerRepo.Create(new Answer
+            });
+            await _answerRepo.Create(new Answer
             {
                 Content = answer3,
                 Value = val3,
                 QuestionId = newQuestion.Id
-            }).Wait();
-            _answerRepo.Create(new Answer
+            });
+            await _answerRepo.Create(new Answer
             {
                 Content = answer4,
                 Value = val4,
                 QuestionId = newQuestion.Id
-            }).Wait();
-            _answerRepo.Create(new Answer
+            });
+            await _answerRepo.Create(new Answer
             {
                 Content = answer5,
                 Value = val5,
                 QuestionId = newQuestion.Id
-            }).Wait();
+            });
 
             return RedirectToAction("ManageQuestions", new{id=questionnaireId});
         }
+
 
         public ActionResult ErrorInfo(int id)
         {
             return View(id);
         }
 
-        public ActionResult RemoveQuestionFromQuestionnaire(int id)
+
+        public async Task<ActionResult> RemoveQuestionFromQuestionnaire(int id)
         {
-            var question = _questionRepo.GetById(id).Result;
+            var question = await _questionRepo.GetById(id);
             var questionnaireId = question.QuestionnaireId;
-            var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+            var answers = await _answerRepo.GetAnswersByQuestionId(question.Id);
             foreach (var answer in answers)
             {
-                _answerRepo.Delete(answer).Wait();
+                await _answerRepo.Delete(answer);
             }
-            _questionRepo.Delete(question).Wait();
+            await _questionRepo.Delete(question);
             return RedirectToAction("ManageQuestions", new { id = questionnaireId });
         }
 
-
-        // GET: QuestionnaireManagerController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnaireManagerController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: QuestionnaireManagerController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnaireManagerController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
