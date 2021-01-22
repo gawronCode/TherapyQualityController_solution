@@ -11,5 +11,6 @@ namespace TherapyQualityController.Repositories.IRepos
         Task<ICollection<UserQuestionnaire>> GetPatientQuestionnairesByEmail(string email);
         Task<ICollection<UserQuestionnaire>> GetPatientQuestionnairesByQuestionnaireId(int id);
         Task<UserQuestionnaire> GetByIdAndUserEmail(int id, string email);
+        Task<ICollection<int>> GetUserQuestionnairesIdByEmail(string email);
     }
 }

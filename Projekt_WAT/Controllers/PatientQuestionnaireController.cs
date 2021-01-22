@@ -6,11 +6,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Models.ViewModels;
-using TherapyQualityController.Repositories;
 using TherapyQualityController.Repositories.IRepos;
 
 namespace TherapyQualityController.Controllers
@@ -21,55 +18,75 @@ namespace TherapyQualityController.Controllers
 
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
-        private readonly IUserRepo _userRepo;
         private readonly IAnswerRepo _answerRepo;
         private readonly IUserAnswerRepo _userAnswerRepo;
         private readonly IUserQuestionnaireAnswerRepo _userQuestionnaireAnswerRepo;
+        private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
 
         public PatientQuestionnaireController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
-            IUserRepo userRepo,
             IAnswerRepo answerRepo,
             IUserAnswerRepo userAnswerRepo,
-            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo)
+            IUserQuestionnaireAnswerRepo userQuestionnaireAnswerRepo,
+            IPatientQuestionnaireRepo patientQuestionnaireRepo)
         {
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
-            _userRepo = userRepo;
             _answerRepo = answerRepo;
             _userAnswerRepo = userAnswerRepo;
             _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
+            _patientQuestionnaireRepo = patientQuestionnaireRepo;
         }
 
-        // GET: PatientQuestionnaireController
-        public ActionResult Index()
+
+        public async Task<ActionResult> Index()
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var userQuestionnaireId = _userRepo.GetUserQuestionnairesIdByEmail(userEmail).Result;
-
+            var userQuestionnaireId = await _patientQuestionnaireRepo.GetUserQuestionnairesIdByEmail(userEmail);
             var questionnaires = userQuestionnaireId.Select(id => _questionnaireRepo.GetById(id).Result).ToList();
+            var answeredQuestionnaires = await _userQuestionnaireAnswerRepo.GetByUserEmail(userEmail);
+            var todayAnsweredQuestionnaires = answeredQuestionnaires.Where(q => q.AnswerDate.Value.Date == DateTime.Today).ToList();
+            var idToRemove = questionnaires.Where(questionnaire => todayAnsweredQuestionnaires.Count(q => q.QuestionnaireId == questionnaire.Id) >= 5).Select(questionnaire => questionnaire.Id).ToList();
 
-            var model = questionnaires.Select(questionnaire => new QuestionnaireViewModel {Fields = null, Id = questionnaire.Id, Name = questionnaire.Name}).ToList();
+            foreach (var id in idToRemove)
+            {
+                questionnaires.Remove(questionnaires.FirstOrDefault(q => q.Id == id));
+            }
+
+            var model = questionnaires.Select(questionnaire => 
+                new QuestionnaireViewModel
+                {
+                    Fields = null,
+                    Id = questionnaire.Id,
+                    Name = questionnaire.Name
+                }).ToList();
 
             return View(model);
         }
 
-        public ActionResult FillQuestionnaire(int id)
+
+        public async Task<ActionResult> FillQuestionnaire(int id)
         {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var patientQuestionnairesIds = await _patientQuestionnaireRepo.GetUserQuestionnairesIdByEmail(userEmail);
+            if (!patientQuestionnairesIds.Contains(id)) return RedirectToAction(nameof(Index));
 
-            var questionnaire = _questionnaireRepo.GetById(id).Result;
-            var questions = _questionRepo.GetQuestionsByQuestionnaireId(id).Result;
+            var answeredQuestionnaires = await _userQuestionnaireAnswerRepo.GetByUserEmail(userEmail);
+            if (answeredQuestionnaires.Where(q => q.AnswerDate.Value.Date == DateTime.Today && q.QuestionnaireId == id).ToList().Count >= 5) return RedirectToAction(nameof(Index));
+
+            var questionnaire = await _questionnaireRepo.GetById(id);
+            var questions = await _questionRepo.GetQuestionsByQuestionnaireId(id);
             
-
             var model = new QuestionnaireViewModel
             {
                 Name = questionnaire.Name,
                 Fields = new List<FieldViewModel>()
             };
+
             var i = 0;
             foreach (var question in questions)
             {
-                var answers = _answerRepo.GetAnswersByQuestionId(question.Id).Result;
+                var answers = await _answerRepo.GetAnswersByQuestionId(question.Id);
                 var answerViewModels = answers.Select(answer => new AnswerViewModel { Content = answer.Content, Value = answer.Value }).ToList();
 
                 model.Fields.Add(new FieldViewModel
@@ -83,11 +100,10 @@ namespace TherapyQualityController.Controllers
             }
 
             return View(model);
-
         }
 
         
-        public ActionResult SendAnswers(IFormCollection form)
+        public async Task<ActionResult> SendAnswers(IFormCollection form)
         {
 
             var count = Convert.ToInt32(form["count"]);
@@ -114,27 +130,27 @@ namespace TherapyQualityController.Controllers
                 UserEmail = answers[0].UserEmail
             };
 
-            _userQuestionnaireAnswerRepo.Create(userQuestionnaireAnswer).Wait();
+            await _userQuestionnaireAnswerRepo.Create(userQuestionnaireAnswer);
 
             foreach (var answer in answers)
             {
                 answer.UserQuestionnaireAnswerId = userQuestionnaireAnswer.Id;
             }
 
-
             foreach (var answer in answers)
             {
-                _userAnswerRepo.Create(answer).Wait();
+                await _userAnswerRepo.Create(answer);
             }
 
             return RedirectToAction(nameof(SuccessInfo));
-            
         }
+
 
         public ActionResult SuccessInfo()
         {
             return View();
         }
+
 
         public ActionResult ErrorInfo()
         {

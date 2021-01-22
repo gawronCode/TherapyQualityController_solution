@@ -7,6 +7,5 @@ namespace TherapyQualityController.Repositories.IRepos
 {
     public interface IUserRepo : IGeneralRepo<User>
     {
-        Task<ICollection<int>> GetUserQuestionnairesIdByEmail(string email);
     }
 }
