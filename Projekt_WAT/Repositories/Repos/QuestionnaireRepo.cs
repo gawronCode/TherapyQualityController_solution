@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TherapyQualityController.Data;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Repositories.IRepos;
 

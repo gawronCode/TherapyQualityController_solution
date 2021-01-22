@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TherapyQualityController.Data;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Repositories.IRepos;
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using TherapyQualityController.Models;
+﻿using Microsoft.AspNetCore.Identity;
 using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController
@@ -19,7 +14,7 @@ namespace TherapyQualityController
 
         }
 
-        private static void SeedUsers(UserManager<User> userManager)
+        private static async void SeedUsers(UserManager<User> userManager)
         {
             if (userManager.FindByNameAsync("admin").Result != null) return;
             var user = new User
@@ -27,10 +22,10 @@ namespace TherapyQualityController
                 UserName = "admin@gmail.com",
                 Email = "admin@gmail.com"
             };
-            var result = userManager.CreateAsync(user, "password").Result;
+            var result = await userManager.CreateAsync(user, "password");
             if (result.Succeeded)
             {
-                userManager.AddToRoleAsync(user, "Administrator").Wait();
+                await userManager.AddToRoleAsync(user, "Administrator");
             }
         }
 
@@ -41,7 +36,8 @@ namespace TherapyQualityController
             CreateRole(roleManager, "Doctor");
         }
 
-        private static void CreateRole(RoleManager<IdentityRole> roleManager,
+        private static async void CreateRole(
+            RoleManager<IdentityRole> roleManager,
             string roleName)
         {
             if(roleManager.RoleExistsAsync(roleName).Result) return;
@@ -49,7 +45,7 @@ namespace TherapyQualityController
             {
                 Name = roleName
             };
-            var result = roleManager.CreateAsync(role).Result;
+            var result = await roleManager.CreateAsync(role);
         }
 
     }

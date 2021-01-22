@@ -6,9 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TherapyQualityController.Data;
-using TherapyQualityController.Models;
 using TherapyQualityController.Models.DbModels;
-using TherapyQualityController.Repositories;
 using TherapyQualityController.Repositories.IRepos;
 using TherapyQualityController.Repositories.Repos;
 
@@ -74,7 +72,6 @@ namespace TherapyQualityController
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
