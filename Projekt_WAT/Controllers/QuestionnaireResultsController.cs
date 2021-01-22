@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TherapyQualityController.Models.DbModels;
 using TherapyQualityController.Models.TmpModels;
 using TherapyQualityController.Models.ViewModels;
@@ -14,11 +14,9 @@ namespace TherapyQualityController.Controllers
     [Authorize(Roles = "Administrator,Doctor")]
     public class QuestionnaireResultsController : Controller
     {
-
         private readonly IQuestionnaireRepo _questionnaireRepo;
         private readonly IQuestionRepo _questionRepo;
         private readonly IUserRepo _userRepo;
-        private readonly IAnswerRepo _answerRepo;
         private readonly IPatientQuestionnaireRepo _patientQuestionnaireRepo;
         private readonly UserManager<User> _userManager;
         private readonly IUserAnswerRepo _userAnswerRepo;
@@ -27,7 +25,6 @@ namespace TherapyQualityController.Controllers
         public QuestionnaireResultsController(IQuestionnaireRepo questionnaireRepo,
             IQuestionRepo questionRepo,
             IUserRepo userRepo,
-            IAnswerRepo answerRepo,
             IPatientQuestionnaireRepo patientQuestionnaireRepo,
             UserManager<User> userManager,
             IUserAnswerRepo userAnswerRepo,
@@ -36,17 +33,15 @@ namespace TherapyQualityController.Controllers
             _questionnaireRepo = questionnaireRepo;
             _questionRepo = questionRepo;
             _userRepo = userRepo;
-            _answerRepo = answerRepo;
             _patientQuestionnaireRepo = patientQuestionnaireRepo;
             _userManager = userManager;
             _userAnswerRepo = userAnswerRepo;
             _userQuestionnaireAnswerRepo = userQuestionnaireAnswerRepo;
         }
 
-        // GET: QuestionnaireResultsController
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            var patients = _userRepo.GetAll().Result;
+            var patients = await _userRepo.GetAll();
             var model = (from patient in patients
                          where _userManager.IsInRoleAsync(patient, "Patient").Result
                          select new PatientViewModel
@@ -61,9 +56,9 @@ namespace TherapyQualityController.Controllers
         }
 
 
-        public ActionResult PatientQuestionnaires(string id)
+        public async Task<ActionResult> PatientQuestionnaires(string id)
         {
-            var patientQuestionnaires = _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id).Result;
+            var patientQuestionnaires = await _patientQuestionnaireRepo.GetPatientQuestionnairesByEmail(id);
             var patientQuestionnaireViewModels = patientQuestionnaires.Select(patientQuestionnaire =>
                 new PatientQuestionnaireViewModel
                 {
@@ -81,14 +76,14 @@ namespace TherapyQualityController.Controllers
             return View(model);
         }
 
-        public ActionResult PatientQuestionnaireResults(int id, string email)
+        public async Task<ActionResult> PatientQuestionnaireResults(int id, string email)
         {
-            var userAnswers = _userAnswerRepo.GetUserAnswersByUserEmail(email).Result;
+            var userAnswers = await _userAnswerRepo.GetUserAnswersByUserEmail(email);
             
             var answersToSelectedQuestionnaire = userAnswers.Where(answer =>
                 _questionRepo.GetById(answer.QuestionId).Result.QuestionnaireId == id).ToList();
 
-            var user = _userManager.FindByEmailAsync(email).Result;
+            var user = await _userManager.FindByEmailAsync(email);
 
             var model = new ResultViewModel
             {
@@ -101,9 +96,7 @@ namespace TherapyQualityController.Controllers
 
             if (answersToSelectedQuestionnaire.Count==0) return View(model);
 
-            var questionnaireAnswered = _userQuestionnaireAnswerRepo.GetByUserEmailAndQuestionnaireId(email, id).Result;
-
-
+            var questionnaireAnswered = await _userQuestionnaireAnswerRepo.GetByUserEmailAndQuestionnaireId(email, id);
             var questionnaireAnswerDetails = new List<QuestionnaireAnswerDetails>();
 
             foreach (var questionnaireAnswer in questionnaireAnswered)
@@ -131,80 +124,11 @@ namespace TherapyQualityController.Controllers
             model.AverageQuestionnaireScore = averageScorePerQuestionnaire.ToArray();
             model.LastQuestionnaireDate = questionnaireAnswerDetails.LastOrDefault().AnswerDate;
             model.NumberOfSolvedQuestionnaires = questionnaireAnswerDetails.Count;
-            model.QuestionnaireName = _questionnaireRepo.GetById(id).Result.Name;
+            model.QuestionnaireName = (await _questionnaireRepo.GetById(id)).Name;
             model.StudyStart = questionnaireAnswerDetails.FirstOrDefault().AnswerDate;
 
             return View(model);
         }
 
-
-        // GET: QuestionnaireResultsController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: QuestionnaireResultsController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: QuestionnaireResultsController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: QuestionnaireResultsController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnaireResultsController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: QuestionnaireResultsController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: QuestionnaireResultsController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
     }
 }
