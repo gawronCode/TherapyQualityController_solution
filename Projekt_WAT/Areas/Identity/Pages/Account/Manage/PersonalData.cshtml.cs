@@ -8,7 +8,7 @@ using TherapyQualityController.Models.DbModels;
 
 namespace TherapyQualityController.Areas.Identity.Pages.Account.Manage
 {
-    [Authorize(Roles = "Administrator")]
+    
     public class PersonalDataModel : PageModel
     {
         private readonly UserManager<User> _userManager;
